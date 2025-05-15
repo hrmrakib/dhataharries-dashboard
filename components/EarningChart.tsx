@@ -31,8 +31,8 @@ export function EarningsChart({ data }: EarningsChartProps) {
           {
             label: "Earnings",
             data: data.map((item) => item.amount),
-            backgroundColor: "#20474E",
-            borderColor: "#20474E",
+            backgroundColor: "#760C2A",
+            borderColor: "#760C2A",
             borderRadius: 4,
           },
         ],

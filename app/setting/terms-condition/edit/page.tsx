@@ -32,24 +32,31 @@ const defaultContent = `
 
 const EditAboutUs = () => {
   useEffect(() => {
-    const editorContainer = document.getElementById("editor");
+    const loadQuill = async () => {
+      const Quill = (await import("quill")).default;
 
-    // Prevent double initialization
-    if (
-      editorContainer &&
-      !editorContainer.classList.contains("ql-container")
-    ) {
-      const quill = new Quill(editorContainer, {
-        theme: "snow",
-        placeholder: "Enter your update about us...",
-      });
+      const editorContainer = document.getElementById("editor");
 
-      quill.clipboard.dangerouslyPasteHTML(defaultContent);
+      if (
+        editorContainer &&
+        !editorContainer.classList.contains("ql-container")
+      ) {
+        const quill = new Quill(editorContainer, {
+          theme: "snow",
+          placeholder: "Enter your update about us...",
+        });
 
-      quill.on("text-change", () => {
-        const html = quill.root.innerHTML;
-        console.log("HTML content:", html);
-      });
+        quill.clipboard.dangerouslyPasteHTML(defaultContent);
+
+        quill.on("text-change", () => {
+          const html = quill.root.innerHTML;
+          console.log("HTML content:", html);
+        });
+      }
+    };
+
+    if (typeof window !== "undefined") {
+      loadQuill();
     }
   }, []);
 

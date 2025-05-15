@@ -24,7 +24,7 @@ export default function RootLayout({
         <SidebarProvider>
           <div className='flex min-h-screen bg-gray-50 w-full'>
             <DashboardSidebar />
-            <div className='flex-1 w-full'>
+            <div className='flex-1 w-full bg-[#FFF0F4]'>
               <DashboardHeader username={username} />
               {children}
             </div>

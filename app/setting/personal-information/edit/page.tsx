@@ -163,9 +163,13 @@ export default function PersonalInformationEditPage() {
                         value={phone}
                         onChange={(phone) => setPhone(phone)}
                         containerClass='w-full' // Ensures the entire component takes full width
-                        inputClass='w-full h-[100px] p-2 border border-[#20474E] rounded-md text-5xl font-semibold text-[#20474E]' // Ensures input field spans full width
-                        buttonClass='border-[#20474E]' // Optional: styles for the country dropdown button
-                        inputStyle={{ width: "100%", height: "40px", border: "1px solid #20474E" }} // Inline style fallback if inputClass fails
+                        inputClass='w-full h-[100px] p-2 border border-[#760C2A] rounded-md text-5xl font-semibold text-[#760C2A]' // Ensures input field spans full width
+                        buttonClass='border-[#760C2A]' // Optional: styles for the country dropdown button
+                        inputStyle={{
+                          width: "100%",
+                          height: "40px",
+                          border: "1px solid #760C2A",
+                        }} // Inline style fallback if inputClass fails
                         placeholder='Enter phone number'
                       />
                     </div>

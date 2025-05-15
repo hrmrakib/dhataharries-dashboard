@@ -19,7 +19,7 @@ export default function SubscriptionPage() {
         <main className='relative w-full p-4 md:p-6'>
           <div className='absolute right-4 mb-6 flex items-center justify-between'>
             <Link href='/subscription/add'>
-              <Button className='text-[#FAFAFA] bg-[#20474E] hover:bg-teal-700'>
+              <Button className='text-[#FAFAFA] bg-[#760C2A] hover:bg-[#760c2ab4]'>
                 <Plus className='mr-2 h-4 w-4' /> Add New Subscription
               </Button>
             </Link>
@@ -90,7 +90,7 @@ function SubscriptionCard({
         <ul className='space-y-4'>
           {features.map((feature, index) => (
             <li key={index} className='flex items-start'>
-              <div className='mr-3 mt-1 flex min-h-6 min-w-6 items-center justify-center rounded-full bg-teal-800 text-white'>
+              <div className='mr-3 mt-1 flex min-h-6 min-w-6 items-center justify-center rounded-full bg-[#760C2A] text-white'>
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
                   viewBox='0 0 24 24'
@@ -111,7 +111,7 @@ function SubscriptionCard({
       </CardContent>
       <CardFooter className='p-6 pt-0'>
         <Link href={`/subscription/edit/${id}`} className='w-full'>
-          <Button className='w-full text-lg text-[#FAFAFA] bg-[#20474E] hover:bg-teal-700'>
+          <Button className='w-full text-lg text-[#FAFAFA] bg-[#760C2A] hover:bg-[#760c2abe]'>
             Edit
           </Button>
         </Link>

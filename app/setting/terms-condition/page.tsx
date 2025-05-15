@@ -20,7 +20,7 @@ export default function TermsConditionPage() {
 
               <Link
                 href='/setting/terms-condition/edit'
-                className='inline-flex items-center text-primary hover:text-teal-700 border border-[#20474E] rounded-md px-4 py-1.5'
+                className='inline-flex items-center text-primary hover:text-teal-700 border border-[#760C2A] rounded-md px-4 py-1.5'
               >
                 <span className='text-xl font-semibold'>Edit</span>
               </Link>

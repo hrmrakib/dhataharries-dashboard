@@ -10,6 +10,8 @@ import {
   Ticket,
   Settings,
   LogOut,
+  NotebookPen,
+  BookType,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -53,12 +55,12 @@ export default function DashboardSidebar() {
       <div className='!bg-white md:!bg-transparent'>
         <Sidebar className='border-r border-gray-200 fixed left-0 h-full z-30 !bg-white md:!bg-transparent'>
           <SidebarContent>
-            <div className='flex items-center gap-2 px-4 py-6'>
+            <div className='flex items-center justify-center gap-2 px-4 py-6'>
               <Image
                 src='/logo.png'
                 alt='logo'
-                width={190}
-                height={190}
+                width={140}
+                height={140}
                 className=''
               />
             </div>
@@ -69,6 +71,23 @@ export default function DashboardSidebar() {
                 icon={LayoutDashboard}
                 label='Dashboard'
                 active={pathname === "/"}
+              />
+              <NavItem
+                href='/users-stories'
+                icon={BookType}
+                label='Users Stories'
+                active={
+                  pathname === "/users-stories" ||
+                  pathname.startsWith("/users-stories")
+                }
+              />
+              <NavItem
+                href='/ms-post'
+                icon={NotebookPen}
+                label='MS Post'
+                active={
+                  pathname === "/ms-post" || pathname.startsWith("/ms-post")
+                }
               />
               <NavItem
                 href='/earning'
@@ -107,7 +126,7 @@ export default function DashboardSidebar() {
           <SidebarFooter className='p-6'>
             <button
               onClick={() => setIsLogoutModalOpen(true)}
-              className='flex w-full items-center gap-3 bg-[#F99F04] px-4 py-3 text-white hover:bg-[#f99f04d2]'
+              className='flex w-full items-center gap-3 bg-[#760C2A] px-4 py-3 text-white hover:bg-[#760c2ae0]'
             >
               <svg
                 width='25'
@@ -155,7 +174,7 @@ function NavItem({ href, icon: Icon, label, active }: NavItemProps) {
           className={cn(
             "flex items-center gap-3 px-4 py-2 transition-colors rounded-full",
             active
-              ? "bg-[#20474E] text-white"
+              ? "bg-[#760C2A] text-white"
               : "text-gray-700 hover:bg-gray-100"
           )}
         >

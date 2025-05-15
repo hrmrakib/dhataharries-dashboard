@@ -167,7 +167,7 @@ function TransactionTable() {
       <div className='overflow-hidden rounded-md border border-gray-200'>
         <div className='overflow-x-auto'>
           <Table>
-            <TableHeader className='bg-teal-800 text-white'>
+            <TableHeader className='bg-[#760C2A] text-white'>
               <TableRow>
                 <TableHead className='text-white'>#Tr.ID</TableHead>
                 <TableHead className='text-white'>User Name</TableHead>
@@ -236,7 +236,7 @@ function TransactionTable() {
                   variant={page === currentPage ? "default" : "outline"}
                   size='sm'
                   className={`h-8 w-8 p-0 ${
-                    page === currentPage ? "bg-teal-800 text-white" : ""
+                    page === currentPage ? "bg-[#760C2A] text-white" : ""
                   }`}
                   onClick={() => handlePageChange(page)}
                 >

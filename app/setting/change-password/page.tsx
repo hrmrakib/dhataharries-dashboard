@@ -75,7 +75,7 @@ export default function ChangePasswordPage() {
                 className='inline-flex items-center text-primary hover:text-teal-700'
               >
                 <ArrowLeft className='mr-2 h-6 w-6' />
-                <span className='text-2xl text-[#20474E] font-semibold'>
+                <span className='text-2xl text-[#760C2A] font-semibold'>
                   Change Password
                 </span>
               </Link>

@@ -216,7 +216,7 @@ function TransactionTable() {
 
         <div className='overflow-x-auto'>
           <Table>
-            <TableHeader className='bg-[#20474E] hover:!bg-[#20474E] text-white'>
+            <TableHeader className='bg-[#760C2A] hover:!bg-[#760C2A] text-white'>
               <TableRow>
                 <TableHead className='text-white'>#Tr.ID</TableHead>
                 <TableHead className='text-white'>User Name</TableHead>
