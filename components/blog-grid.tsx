@@ -11,6 +11,21 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import BlogCard from "./blog-card";
+import {
+  useDeleteBlogMutation,
+  useGetBlogDataQuery,
+} from "@/redux/feature/blogAPI";
+import Loading from "./loading/Loading";
+import Image from "next/image";
+import { Badge } from "./ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { Button } from "./ui/button";
+import { MoreVertical } from "lucide-react";
 
 interface BlogPost {
   id: string;
@@ -19,6 +34,15 @@ interface BlogPost {
   content: string;
   avatar: string;
   isDeleted: boolean;
+}
+interface IBlog {
+  id: number;
+  title: string;
+  author: number;
+  author_name: string;
+  created_at: string;
+  description?: string; // Optional
+  image?: string; // Optional
 }
 
 // Sample data
@@ -39,6 +63,14 @@ export default function BlogGrid() {
   const [blogs, setBlogs] = useState<BlogPost[]>(INITIAL_BLOGS);
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState("all");
+  const [expanded, setExpanded] = useState(false);
+
+  const { data, isLoading } = useGetBlogDataQuery({});
+  const [deleteBlog] = useDeleteBlogMutation({});
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   // Filter blogs based on active tab
   const filteredBlogs = blogs.filter((blog) =>
@@ -65,6 +97,13 @@ export default function BlogGrid() {
     );
   };
 
+  const handleBlogDelete = async (id: number | string) => {
+    const res = await deleteBlog(id);
+    console.log({ res });
+  };
+
+  console.log(data);
+
   return (
     <div className='container mx-auto'>
       <Tabs defaultValue='all' onValueChange={setActiveTab}>
@@ -85,17 +124,72 @@ export default function BlogGrid() {
 
         <TabsContent value='all' className='mt-0'>
           <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
-            {currentBlogs.map((blog) => (
-              <BlogCard
-                key={blog.id}
-                blog={blog}
-                onToggleDelete={handleToggleDelete}
-              />
+            {data.map((blog: IBlog) => (
+              <div className='bg-white rounded-lg p-6 relative'>
+                <div className='flex justify-between items-start mb-4'>
+                  <div className='flex items-center'>
+                    <div className='relative h-16 w-16 rounded-full overflow-hidden'>
+                      <Image
+                        src={blog.image || "/placeholder.svg"}
+                        alt={`author`}
+                        fill
+                        className='object-cover'
+                      />
+                    </div>
+                    {/* {blog.isDeleted && (
+                      <Badge className='absolute top-2 left-20 bg-white text-pink-900 border border-pink-900'>
+                        Deleted
+                      </Badge>
+                    )} */}
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant='ghost' size='icon' className='h-8 w-8'>
+                        <MoreVertical className='h-4 w-4' />
+                        <span className='sr-only'>Open menu</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align='end'>
+                      <DropdownMenuItem
+                        onClick={() => handleBlogDelete(blog.id)}
+                      >
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
+                <div className='space-y-1'>
+                  <h3 className='font-bold text-lg'>{blog.author_name}</h3>
+                  <p className='text-base font-medium text-[#566063]'>
+                    {blog?.title}
+                  </p>
+                  <p className='text-sm mt-2'>
+                    {expanded
+                      ? blog?.description
+                      : `${blog?.description?.substring(0, 120)}...`}
+                    <button
+                      onClick={() => setExpanded(!expanded)}
+                      className='text-gray-500 ml-1 hover:text-gray-700'
+                    >
+                      {expanded ? "less" : "more"}
+                    </button>
+                  </p>
+                </div>
+              </div>
+
+              // <BlogCard
+              //   key={blog.id}
+              //   blog={blog}
+              //   onToggleDelete={handleToggleDelete}
+              // />
             ))}
           </div>
         </TabsContent>
 
-        <TabsContent value='deleted' className='mt-0'>
+        {/* Deleted Tab Contant  */}
+
+        {/* <TabsContent value='deleted' className='mt-0'>
           <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
             {currentBlogs.map((blog) => (
               <BlogCard
@@ -105,7 +199,7 @@ export default function BlogGrid() {
               />
             ))}
           </div>
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
 
       {totalPages > 1 && (

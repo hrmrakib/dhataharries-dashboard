@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Mail } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useForgotPasswordMutation } from "@/redux/feature/authSlice";
+import { useForgotPasswordMutation } from "@/redux/feature/authAPI";
 import { toast } from "sonner";
 
 export default function LoginPage() {
@@ -86,7 +86,9 @@ export default function LoginPage() {
 
         {/* Sign Up Link */}
         <div className='mt-6 text-center text-base'>
-          <span className='text-[#2C383C] text-base'>Already have account? </span>
+          <span className='text-[#2C383C] text-base'>
+            Already have account?{" "}
+          </span>
           <Link
             href='/sign-in'
             className='text-[#760C2A] font-medium hover:underline'

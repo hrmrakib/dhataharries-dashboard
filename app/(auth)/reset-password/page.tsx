@@ -111,7 +111,7 @@ export default function CreatePasswordPage() {
             <path
               d='M10 19L3 12M3 12L10 5M3 12L21 12'
               stroke='#2C383C'
-              stroke-width='2'
+              strokeWidth='2'
               stroke-linecap='round'
               stroke-linejoin='round'
             />

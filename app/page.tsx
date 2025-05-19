@@ -20,27 +20,44 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { EarningsChart } from "@/components/EarningChart";
+import { useGetHomeDataQuery } from "@/redux/feature/homeAPI";
+import Loading from "@/components/loading/Loading";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+interface IUser {
+  id: string;
+  full_name: string;
+  email: string;
+  profile_pic: string;
+
+}
 
 export default function DashboardContent() {
+  const { data } = useGetHomeDataQuery({});
+  if (!data) {
+    return (
+      <div>
+        <Loading />
+      </div>
+    );
+  }
+
+
   return (
     <main className='w-full p-4 md:p-6'>
       <section className='mb-8'>
         <h2 className='mb-4 text-[32px] font-medium text-primary'>Overview</h2>
         <div className='md:container mx-auto'>
           <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-            <StatCard title='Total Earnings' value='$12300' />
-            <StatCard title='Total User' value='520' />
-            <StatCard title='Total Subscriptions' value='1430' />
+            <StatCard title='Total Earnings' value={data?.total_donations} />
+            <StatCard title='Total User' value={data?.all_user_list} />
+            <StatCard title='Total Stories' value={data?.total_stories} />
           </div>
         </div>
       </section>
 
       <section>
-        {/* <h2 className='mb-4 text-[28px] font-medium text-primary'>
-          Transaction
-        </h2> */}
-        <TransactionTable />
+        <TransactionTable user_list={data?.user_list} />
       </section>
     </main>
   );
@@ -62,7 +79,7 @@ function StatCard({ title, value }: StatCardProps) {
   );
 }
 
-function TransactionTable() {
+function TransactionTable({ user_list }: any) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -176,6 +193,7 @@ function TransactionTable() {
     }
   };
 
+
   return (
     <>
       <div className='overflow-hidden rounded-md border border-gray-200'>
@@ -193,25 +211,6 @@ function TransactionTable() {
               </SelectContent>
             </Select>
           </div>
-
-          <div className='h-[250px] w-full mb-16'>
-            <EarningsChart
-              data={[
-                { month: "Jan", amount: 3000 },
-                { month: "Feb", amount: 2500 },
-                { month: "Mar", amount: 6000 },
-                { month: "Apr", amount: 7000 },
-                { month: "May", amount: 6000 },
-                { month: "Jun", amount: 6000 },
-                { month: "Jul", amount: 7000 },
-                { month: "Aug", amount: 4000 },
-                { month: "Sep", amount: 2000 },
-                { month: "Oct", amount: 7000 },
-                { month: "Nov", amount: 8000 },
-                { month: "Dec", amount: 7000 },
-              ]}
-            />
-          </div>
         </div>
 
         <div className='overflow-x-auto'>
@@ -220,33 +219,38 @@ function TransactionTable() {
               <TableRow>
                 <TableHead className='text-white'>#Tr.ID</TableHead>
                 <TableHead className='text-white'>User Name</TableHead>
-                <TableHead className='text-white'>Subscription</TableHead>
+                <TableHead className='text-white'>Email</TableHead>
                 <TableHead className='text-white'>Join Date</TableHead>
                 <TableHead className='text-center text-white'>Action</TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
-              {currentTransactions.map((transaction) => (
-                <TableRow key={transaction.id}>
+              {user_list?.map((user: IUser) => (
+                <TableRow key={user?.id}>
                   <TableCell className='font-medium text-lg text-primary'>
-                    {transaction.id}
+                    {user?.id}
                   </TableCell>
                   <TableCell className='text-lg text-primary'>
-                    {transaction.name}
+                    {user?.full_name}
                   </TableCell>
                   <TableCell className='text-lg text-primary'>
-                    {transaction.subscription}
+                    {user?.email}
                   </TableCell>
                   <TableCell className='text-lg text-primary'>
-                    {transaction.date}
+                    <Avatar>
+                      <AvatarImage
+                        src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${user?.profile_pic}`}
+                      />
+                      <AvatarFallback>{user?.full_name}</AvatarFallback>
+                    </Avatar>
                   </TableCell>
                   <TableCell className='text-center text-lg text-primary'>
                     <Button
                       variant='ghost'
                       size='sm'
                       className='h-8 w-8 p-0'
-                      onClick={() => openUserModal(transaction)}
+                      onClick={() => openUserModal(user)}
                     >
                       <Info className='h-6 w-6' />
                     </Button>

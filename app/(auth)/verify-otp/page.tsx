@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useVerifyEmailMutation } from "@/redux/feature/authSlice";
+import { useVerifyEmailMutation } from "@/redux/feature/authAPI";
 import { toast } from "sonner";
 function VerifyOTP() {
   const router = useRouter();
@@ -119,7 +119,7 @@ function VerifyOTP() {
             <path
               d='M10 19L3 12M3 12L10 5M3 12L21 12'
               stroke='#2C383C'
-              stroke-width='2'
+              strokeWidth='2'
               stroke-linecap='round'
               stroke-linejoin='round'
             />

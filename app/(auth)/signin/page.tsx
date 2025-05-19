@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Mail, KeyRound, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import { useLoginMutation } from "@/redux/feature/authSlice";
+import { useLoginMutation } from "@/redux/feature/authAPI";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 

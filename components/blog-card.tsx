@@ -1,5 +1,16 @@
 "use client";
 
+/**
+ *
+ *
+ * Code go to blog-grid file (deletable)
+ *
+ *
+ *
+ *
+ *
+ */
+
 import { useState } from "react";
 import Image from "next/image";
 import { MoreVertical } from "lucide-react";
@@ -12,17 +23,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-interface BlogPost {
-  id: string;
-  author: string;
-  title: string;
-  content: string;
-  avatar: string;
-  isDeleted: boolean;
+interface IBlog {
+  author: number;
+  author_name: string;
+  created_at: string;
+  description?: string; // Optional
+  id: number;
+  image?: string; // Optional
 }
 
 interface BlogCardProps {
-  blog: BlogPost;
+  blog: IBlog;
   onToggleDelete: (id: string) => void;
 }
 
@@ -35,8 +46,8 @@ export default function BlogCard({ blog, onToggleDelete }: BlogCardProps) {
         <div className='flex items-center'>
           <div className='relative h-16 w-16 rounded-full overflow-hidden'>
             <Image
-              src={blog.avatar || "/placeholder.svg"}
-              alt={blog.author}
+              src={blog.image || "/placeholder.svg"}
+              alt={`author`}
               fill
               className='object-cover'
             />
