@@ -2,222 +2,126 @@
 
 import type React from "react";
 
-import { useState, type FormEvent } from "react";
-import Image from "next/image";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Mail, KeyRound, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import { Eye, EyeOff } from "lucide-react";
+import { useLoginMutation } from "@/redux/feature/authSlice";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-export default function SignInPage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    password: "",
-    remember: false,
-  });
+export default function Login() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [login] = useLoginMutation();
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
-    }
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) {
+    if (!email || !password) {
+      alert("Please fill in all fields");
       return;
     }
 
-    setIsSubmitting(true);
+    setIsLoading(true);
 
+    // Simulate API call
     try {
-      // Simulate API call
+      const res = await login({ email, password }).unwrap();
+      console.log("res", res);
+      localStorage.setItem("accessToken", res?.access);
+      // In a real app, you would call your authentication API here
       await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log("Login attempted with:", { email, password });
+      // alert("Login successful!");
+      toast.success(res?.message || "Login successful!");
 
-      console.log("Form submitted with data:", formData);
-      setSubmitSuccess(true);
-
-      // In a real app, you would redirect to dashboard or home page after successful login
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      setErrors({ submit: "Invalid credentials. Please try again." });
+      router.push("/");
+    } catch (error: unknown) {
+      console.error("Login failed:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Login failed. Please try again.";
+      toast.error(errorMessage);
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
-  };
-
   return (
-    <main className='w-full min-h-screen flex flex-col md:flex-row items-center justify-center p-4 md:p-8'>
-      <div className='container mx-auto flex flex-col md:flex-row items-center'>
-        {/* Logo Section */}
-        <div className='hidden w-full md:w-1/2 md:flex items-center justify-center p-8'>
-          <Link href='/' className='max-w-xs'>
-            <Image
-              src='/logo.svg'
-              alt='DesignDoc Logo'
-              width={300}
-              height={150}
-              className='mb-2'
-            />
-          </Link>
-        </div>
+    <main className='min-h-screen bg-[url("/auth-bg.png")] bg-no-repeat bg-center bg-cover flex items-center justify-center p-4'>
+      <div className='absolute top-0 left-0 w-full h-full bg-[#2c383c8c] opacity-50'></div>
+      <div className='bg-white rounded-lg shadow-lg max-w-md w-full p-6 md:p-8 z-[100]'>
+        <h1 className='text-[32px] font-semibold text-center text-[#2C383C] mb-8'>
+          Login
+        </h1>
 
-        {/* Form Section */}
-        <div className='w-full md:w-1/2 max-w-md'>
-          <div className='text-center mb-6'>
-            <h1 className='text-[32px] font-bold text-primary mb-2'>
-              Sign In Now
-            </h1>
-            <p className='text-primary text-lg'>
-              Welcome back! Select method log in
-            </p>
-          </div>
-
-          {submitSuccess ? (
-            <div className='bg-green-50 border border-green-200 text-green-700 p-4 rounded-md mb-6'>
-              Sign in successful! Redirecting to your dashboard...
+        <form onSubmit={handleSubmit} className='space-y-4'>
+          {/* Email Input */}
+          <div className='relative mb-5'>
+            <div className='absolute inset-y-0 left-3 flex items-center pointer-events-none'>
+              <Mail className='h-5 w-5 text-[#2C383C]' />
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} className='space-y-4'>
-              <div>
-                <label
-                  htmlFor='name'
-                  className='block text-primary text-lg font-medium mb-1'
-                >
-                  Name
-                </label>
-                <input
-                  type='text'
-                  id='name'
-                  name='name'
-                  placeholder='Full name...'
-                  value={formData.name}
-                  onChange={handleChange}
-                  className={`w-full p-3 border placeholder:text-primary ${
-                    errors.name ? "border-red-500" : "border-slate-300"
-                  } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                />
-                {errors.name && (
-                  <p className='text-red-500 text-sm mt-1'>{errors.name}</p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  htmlFor='password'
-                  className='block text-primary text-lg font-medium mb-1'
-                >
-                  Password
-                </label>
-                <div className='relative'>
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    id='password'
-                    name='password'
-                    placeholder='Enter your password...'
-                    value={formData.password}
-                    onChange={handleChange}
-                    className={`w-full p-3 border placeholder:text-primary ${
-                      errors.password ? "border-red-500" : "border-slate-300"
-                    } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                  />
-                  <button
-                    type='button'
-                    onClick={togglePasswordVisibility}
-                    className='absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-500'
-                  >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </button>
-                </div>
-                {errors.password && (
-                  <p className='text-red-500 text-sm mt-1'>{errors.password}</p>
-                )}
-              </div>
-
-              <div className='flex items-center justify-between'>
-                <div className='flex items-center'>
-                  <input
-                    type='checkbox'
-                    id='remember'
-                    name='remember'
-                    checked={formData.remember}
-                    onChange={handleChange}
-                    className='w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500'
-                  />
-                  <label
-                    htmlFor='remember'
-                    className='ml-2 text-lg text-primary'
-                  >
-                    Remember
-                  </label>
-                </div>
-                <Link
-                  href='/forget-password'
-                  className='text-lg font-medium text-[#F99F04] hover:underline'
-                >
-                  Forget Password?
-                </Link>
-              </div>
-
-              {errors.submit && (
-                <p className='text-red-500 text-sm'>{errors.submit}</p>
-              )}
-
-              <button
-                type='submit'
-                disabled={isSubmitting}
-                className='w-full bg-[#F99F04] hover:bg-[#f99f04d2] text-[#FAFAFA] text-lg font-medium py-3 px-4 rounded-md transition duration-200 ease-in-out'
-              >
-                {isSubmitting ? "Signing In..." : "Sign In Now"}
-              </button>
-            </form>
-          )}
-
-          <div className='text-center mt-6'>
-            <p className='text-primary text-lg'>
-              Don&apos;t have an account?{" "}
-              <Link
-                href='/create-account'
-                className='text-primary text-lg font-medium hover:underline'
-              >
-                Sign Up Now
-              </Link>
-            </p>
+            <Input
+              type='email'
+              placeholder='Enter your email...'
+              className='pl-10 pr-4 py-2.5 rounded-full bg-transparent border border-[#2C383C] placeholder:text-[#2C383C] w-full'
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
           </div>
-        </div>
+
+          {/* Password Input */}
+          <div className='relative'>
+            <div className='absolute inset-y-0 left-3 flex items-center pointer-events-none'>
+              <KeyRound className='h-5 w-5 text-[#2C383C]' />
+            </div>
+            <Input
+              type={showPassword ? "text" : "password"}
+              placeholder='Enter Password'
+              className='pl-10 pr-10 py-2 rounded-full border border-[#2C383C] placeholder:text-[#2C383C] w-full'
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <button
+              type='button'
+              className='absolute inset-y-0 right-3 flex items-center'
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? (
+                <EyeOff className='h-5 w-5 text-gray-400' />
+              ) : (
+                <Eye className='h-5 w-5 text-gray-400' />
+              )}
+            </button>
+          </div>
+
+          {/* Forgot Password */}
+          <div className='flex justify-end'>
+            <Link
+              href='/forget-password'
+              className='text-base text-[#2C383C] hover:text-[#7a0c2e] hover:underline'
+            >
+              Forgot Password
+            </Link>
+          </div>
+
+          {/* Sign In Button */}
+          <Button
+            type='submit'
+            className='w-full bg-[#7a0c2e] hover:bg-[#690a27] text-white py-2 rounded-full'
+            disabled={isLoading}
+          >
+            {isLoading ? "Signing In..." : "Sign In"}
+          </Button>
+        </form>
       </div>
     </main>
   );

@@ -2,158 +2,97 @@
 
 import type React from "react";
 
-import { useState, type FormEvent } from "react";
-import Image from "next/image";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Mail } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useForgotPasswordMutation } from "@/redux/feature/authSlice";
+import { toast } from "sonner";
 
-export default function ForgetPassword() {
-  const [formData, setFormData] = useState({
-    name: "",
-    password: "",
-    remember: false,
-  });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
+export default function LoginPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+  const [isLoading, setIsLoading] = useState(false);
+  const [forgotPassword] = useForgotPasswordMutation();
 
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
-    }
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) {
+    if (!email) {
+      alert("Please fill in all fields");
       return;
     }
 
-    setIsSubmitting(true);
+    setIsLoading(true);
 
+    // Simulate API call
     try {
-      // Simulate API call
+      const res = await forgotPassword({ email }).unwrap();
+      console.log(res, "res");
+      // In a real app, you would call your authentication API here
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      console.log("Form submitted with data:", formData);
-      setSubmitSuccess(true);
-
-      // In a real app, you would redirect to dashboard or home page after successful login
+      console.log("Login attempted with:", { email });
+      toast.success(res?.message || "Email sent successfully!");
+      router.push(`/forgetVerify?email=${email}`);
     } catch (error) {
-      console.error("Error submitting form:", error);
-      setErrors({ submit: "Invalid credentials. Please try again." });
+      console.error("Login failed:", error);
+      alert("Login failed. Please try again.");
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <main className='w-full min-h-screen flex flex-col md:flex-row items-center justify-center p-4 md:p-8'>
-      <div className='container mx-auto flex flex-col md:flex-row items-center'>
-        {/* Logo Section */}
-        <div className='hidden w-full md:w-1/2 md:flex items-center justify-center p-8'>
-          <Link href='/' className='max-w-xs'>
-            <Image
-              src='/logo.svg'
-              alt='DesignDoc Logo'
-              width={300}
-              height={150}
-              className='mb-2'
-            />
-          </Link>
+    <main className='min-h-screen bg-[url("/auth-bg.png")] bg-no-repeat bg-center bg-cover flex items-center justify-center p-4'>
+      <div className='absolute top-0 left-0 w-full h-full inset-0 bg-[#2c383c8c] opacity-50'></div>
+
+      <div className='bg-white rounded-lg shadow-lg max-w-[545px] w-full p-6 md:p-8 z-[100]'>
+        <div>
+          <h1 className='text-[32px] font-semibold text-center text-[#2C383C] mb-2'>
+            Forget Password
+          </h1>
+          <p className='text-lg text-center text-[#2C383C] mb-8 w-[350px] mx-auto'>
+            Please enter your email address to reset your password.
+          </p>
         </div>
-
-        {/* Form Section */}
-        <div className='w-full md:w-1/2 max-w-md'>
-          <div className='text-center mb-6'>
-            <h1 className='text-[32px] font-bold text-primary mb-2'>
-              Forget Your Password
-            </h1>
-            <p className='text-primary text-lg'>
-              Welcome back! Select method to log in
-            </p>
-          </div>
-
-          {submitSuccess ? (
-            <div className='bg-green-50 border border-green-200 text-green-700 p-4 rounded-md mb-6'>
-              Sign in successful! Redirecting to your dashboard...
+        <form onSubmit={handleSubmit} className='space-y-4'>
+          {/* Email Input */}
+          <div className='relative'>
+            <div className='absolute inset-y-0 left-3 flex items-center pointer-events-none'>
+              <Mail className='h-5 w-5 text-gray-400' />
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} className='space-y-4'>
-              <div>
-                <label
-                  htmlFor='email'
-                  className='block text-primary text-lg font-medium mb-1'
-                >
-                  Email
-                </label>
-                <input
-                  type='email'
-                  id='email'
-                  name='email'
-                  placeholder='Enter your email'
-                  value={formData.name}
-                  onChange={handleChange}
-                  className={`w-full p-3 border placeholder:text-primary ${
-                    errors.name ? "border-red-500" : "border-slate-300"
-                  } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                />
-                {errors.name && (
-                  <p className='text-red-500 text-sm mt-1'>{errors.name}</p>
-                )}
-              </div>
-
-              {errors.submit && (
-                <p className='text-red-500 text-sm'>{errors.submit}</p>
-              )}
-
-              <button
-                type='submit'
-                disabled={isSubmitting}
-                className='w-full bg-[#F99F04] hover:bg-[#f99f04d2] text-[#FAFAFA] text-lg font-medium py-3 px-4 rounded-md transition duration-200 ease-in-out'
-              >
-                {isSubmitting ? "Reset Password ..." : "Reset Password"}
-              </button>
-            </form>
-          )}
-
-          <div className='text-center mt-6'>
-            <p className='text-primary text-lg'>
-              Back to{" "}
-              <Link
-                href='/signin'
-                className='text-primary text-lg font-medium hover:underline'
-              >
-                Sign In
-              </Link>
-            </p>
+            <Input
+              type='email'
+              placeholder='Enter your email...'
+              className='pl-10 pr-4 py-2 rounded-full border border-gray-300 w-full'
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
           </div>
+
+          {/* Sign In Button */}
+          <Button
+            type='submit'
+            className='w-full h-[56px] text-lg font-medium bg-[#7a0c2e] hover:bg-[#690a27] text-white py-2 rounded-full'
+            disabled={isLoading}
+          >
+            {isLoading ? "Send OTP ..." : "Send OTP"}
+          </Button>
+        </form>
+
+        {/* Sign Up Link */}
+        <div className='mt-6 text-center text-base'>
+          <span className='text-[#2C383C] text-base'>Already have account? </span>
+          <Link
+            href='/sign-in'
+            className='text-[#760C2A] font-medium hover:underline'
+          >
+            Sign in
+          </Link>
         </div>
       </div>
     </main>
