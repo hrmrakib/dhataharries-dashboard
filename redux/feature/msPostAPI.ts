@@ -25,8 +25,8 @@ const msPostAPI = baseApi.injectEndpoints({
     }),
 
     createMSPost: builder.mutation({
-      query: ({ id, data }: { id: number | string; data: any }) => ({
-        url: `/blogs/v1/ms-posts/${id}/`,
+      query: ({ data }: { data: any }) => ({
+        url: `/blogs/v1/ms-posts/`,
         method: "POST",
         body: data,
         headers: {
