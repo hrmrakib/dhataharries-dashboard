@@ -5,13 +5,11 @@ import type React from "react";
 import Link from "next/link";
 import {
   LayoutDashboard,
-  DollarSign,
   Users,
-  Ticket,
   Settings,
-  LogOut,
   NotebookPen,
   BookType,
+  HeartPulse,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -89,14 +87,7 @@ export default function DashboardSidebar() {
                   pathname === "/ms-post" || pathname.startsWith("/ms-post")
                 }
               />
-              <NavItem
-                href='/earning'
-                icon={DollarSign}
-                label='Earning'
-                active={
-                  pathname === "/earning" || pathname.startsWith("/earning/")
-                }
-              />
+
               <NavItem
                 href='/users'
                 icon={Users}
@@ -104,12 +95,12 @@ export default function DashboardSidebar() {
                 active={pathname === "/users" || pathname.startsWith("/users/")}
               />
               <NavItem
-                href='/subscription'
-                icon={Ticket}
-                label='Subscription'
+                href='/donation-list'
+                icon={HeartPulse}
+                label='Donation list'
                 active={
-                  pathname === "/subscription" ||
-                  pathname.startsWith("/subscription/")
+                  pathname === "/donation-list" ||
+                  pathname.startsWith("/donation-list/")
                 }
               />
               <NavItem
