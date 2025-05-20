@@ -12,6 +12,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { useGetMSPostQuery } from "@/redux/feature/msPostAPI";
+import Loading from "@/components/loading/Loading";
 
 // Sample blog post data
 const allBlogPosts = Array(24).fill({
@@ -24,9 +26,22 @@ const allBlogPosts = Array(24).fill({
 
 const POSTS_PER_PAGE = 6;
 
+interface BlogPost {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+}
+
 export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(allBlogPosts.length / POSTS_PER_PAGE);
+
+  const { data, isLoading } = useGetMSPostQuery(undefined);
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   // Calculate which posts to display based on current page
   const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
@@ -40,6 +55,8 @@ export default function Home() {
       window.scrollTo(0, 0);
     }
   };
+
+  console.log(data);
 
   return (
     <main className='min-h-screen bg-pink-50 p-4 md:p-8'>
@@ -57,14 +74,14 @@ export default function Home() {
 
         {/* Blog posts grid */}
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-          {currentPosts.map((post, index) => (
+          {data?.map((post: BlogPost) => (
             <div
-              key={index}
+              key={post.id}
               className='bg-white rounded-lg overflow-hidden shadow-sm'
             >
               <div className='relative h-48 w-full'>
                 <Image
-                  src={post.image || "/placeholder.svg"}
+                  src={post?.image || "/placeholder.svg"}
                   alt={post.title}
                   fill
                   className='object-cover'
@@ -72,13 +89,13 @@ export default function Home() {
               </div>
               <div className='p-4'>
                 <h2 className='text-2xl text-[#2C383C] font-semibold mb-2 hover:underline'>
-                  <Link href={`/posts/${post.id}`}>{post.title}</Link>
+                  <Link href={`/posts/${post.id}`}>{post?.title}</Link>
                 </h2>
                 <p className='text-sm text-[#727A7C] mb-4 line-clamp-4'>
-                  {post.content}
+                  {post?.description}
                 </p>
                 <Link
-                  href={`/ms-post/edit`}
+                  href={`/ms-post/${post.id}`}
                   className='inline-block border border-red-900 text-[#FFFFFF] hover:text-red-900 bg-[#760C2A] hover:bg-transparent px-6 py-2 rounded-md text-sm transition-colors'
                 >
                   Edit Post

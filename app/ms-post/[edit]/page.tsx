@@ -3,25 +3,48 @@
 import type React from "react";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  useGetASingleMSPostQuery,
+  useUpdateMSPostMutation,
+} from "@/redux/feature/msPostAPI";
+import Loading from "@/components/loading/Loading";
+import { toast } from "sonner";
 
-export default function EditPost({ params }: { params: { id: string } }) {
+export default function EditPost() {
   const router = useRouter();
   const [post, setPost] = useState({
     title: "What Does The 2025 Spring Statement Mean For People MS?",
-    content:
+    description:
       "Key Proposals include Tightening Eligibility Criteria For Personal Independence Payment (PIP) From November 2026. Claimants Will Need To Score At Least Four Points On A Single Daily Living Activity To Qualify For The Daily Living Component, Potentially Reducing Support For Those With Fluctuating Conditions Like MS.",
-    image: "/placeholder.svg?height=400&width=800",
+    image: "/post.jpg",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  // In a real app, you would fetch the post data based on the ID
+  const params = useParams();
+
+  const [updateMSPost] = useUpdateMSPostMutation();
+  const { data, isLoading: isPostLoading } = useGetASingleMSPostQuery(
+    (params.edit as string) || ""
+  );
+
   useEffect(() => {
-    // Simulating data fetching
-    console.log(`Fetching post with ID: ${params.id}`);
-  }, [params.id]);
+    if (data) {
+      setPost({
+        title: data?.title,
+        description: data?.description,
+        image: data?.image || "/placeholder.svg",
+      });
+    }
+  }, [data]);
+
+  if (isPostLoading) {
+    return <Loading />;
+  }
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -30,15 +53,49 @@ export default function EditPost({ params }: { params: { id: string } }) {
     setPost((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImage(file);
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const formData = new FormData();
 
-    setIsLoading(false);
-    router.push("/");
+    formData.append("title", post.title);
+    formData.append("description", post.description);
+    if (image) {
+      formData.append("image", image);
+    }
+
+    try {
+      const res = await updateMSPost({
+        id: (params.edit as string) || "",
+        data: formData,
+      });
+      console.log(res, "res of create post");
+
+      if (res?.data) {
+        toast.success("Post created successfully!");
+        router.push("/ms-post");
+      } else {
+        toast.error("Failed to create post");
+      }
+    } catch (error) {
+      toast.error("Error creating post:");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -58,7 +115,7 @@ export default function EditPost({ params }: { params: { id: string } }) {
               type='text'
               id='title'
               name='title'
-              value={post.title}
+              value={post?.title}
               onChange={handleChange}
               className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500'
               required
@@ -73,9 +130,9 @@ export default function EditPost({ params }: { params: { id: string } }) {
               Content
             </label>
             <textarea
-              id='content'
-              name='content'
-              value={post.content}
+              id='description'
+              name='description'
+              value={post?.description}
               onChange={handleChange}
               rows={6}
               className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500'
@@ -88,12 +145,21 @@ export default function EditPost({ params }: { params: { id: string } }) {
               Current Image
             </label>
             <div className='relative h-48 w-full'>
-              <Image
-                src={post.image || "/placeholder.svg"}
-                alt='Post image'
-                fill
-                className='object-cover rounded-md'
-              />
+              {imagePreview ? (
+                <Image
+                  src={imagePreview}
+                  alt='Post image'
+                  fill
+                  className='object-cover rounded-md'
+                />
+              ) : (
+                <Image
+                  src={post?.image || "/post.jpg"}
+                  alt='Post image'
+                  fill
+                  className='object-cover rounded-md'
+                />
+              )}
             </div>
           </div>
 
@@ -107,6 +173,7 @@ export default function EditPost({ params }: { params: { id: string } }) {
             <input
               type='file'
               id='image'
+              onChange={handleImageChange}
               name='image'
               className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500'
             />

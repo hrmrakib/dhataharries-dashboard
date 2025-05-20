@@ -5,6 +5,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import DashboardHeader from "@/components/dashboard-header";
 import DashboardSidebar from "@/components/dashboard-sidebar";
 import Providers from "@/redux/Providers";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "DesignDoc We Simplify",
@@ -22,6 +23,7 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body upword-verified='true'>
+        <Toaster position='top-center' />
         <Providers>
           <SidebarProvider>
             <div className='flex min-h-screen bg-gray-50 w-full'>
