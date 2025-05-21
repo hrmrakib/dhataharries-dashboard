@@ -65,7 +65,7 @@ export default function BlogGrid() {
   const [activeTab, setActiveTab] = useState("all");
   const [expanded, setExpanded] = useState(false);
 
-  const { data, isLoading } = useGetBlogDataQuery({});
+  const { data, isLoading, refetch } = useGetBlogDataQuery({});
   const [deleteBlog] = useDeleteBlogMutation({});
 
   if (isLoading) {
@@ -99,10 +99,12 @@ export default function BlogGrid() {
 
   const handleBlogDelete = async (id: number | string) => {
     const res = await deleteBlog(id);
-    console.log({ res });
+    if (res.error) {
+      console.log("Error deleting blog:", res.error);
+    } else {
+      refetch();
+    }
   };
-
-  console.log(data.length);
 
   return (
     <div className='w-full containe mx-auto'>

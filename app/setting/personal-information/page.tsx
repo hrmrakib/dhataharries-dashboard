@@ -73,28 +73,26 @@ export default function PersonalInformationPage() {
                 </div>
 
                 {/* User Information Section */}
-                <div className='flex-1 space-y-12'>
-                  <div className='grid grid-cols-1 md:grid-cols-3 gap-4 py-3 border-b border-gray-100'>
+                <div className='flex-1 space-y-6'>
+                  <div className='flex flex-col gap-1'>
                     <div className='text-lg font-medium text-primary'>Name</div>
-                    <div className='md:col-span-2 text-lg  text-primary'>
+                    <div className='text-lg text-primary px-2 py-3 rounded-md border border-gray-500'>
                       {data?.full_name}
                     </div>
                   </div>
 
-                  <div className='grid grid-cols-1 md:grid-cols-3 gap-4 py-3 border-b border-gray-100'>
+                  <div className='flex flex-col gap-1'>
                     <div className='text-lg font-medium text-primary'>
                       Email
                     </div>
-                    <div className='md:col-span-2 text-lg text-primary'>
-                      {data?.email}
-                    </div>
+                    <div className='text-lg text-primary px-2 py-3 rounded-md border border-gray-500'>{data?.email}</div>
                   </div>
 
-                  <div className='grid grid-cols-1 md:grid-cols-3 gap-4 py-3'>
+                  <div className='flex flex-col gap-1'>
                     <div className='text-lg font-medium text-primary'>
                       Phone Number
                     </div>
-                    <div className='md:col-span-2 text-lg text-primary'>
+                    <div className='text-lg text-primary px-2 py-3 rounded-md border border-gray-500'>
                       {data?.mobile_no}
                     </div>
                   </div>
