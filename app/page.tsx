@@ -1,6 +1,6 @@
 "use client";
 
-import { Info } from "lucide-react";
+import { Info, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState } from "react";
+import { use, useRef, useState } from "react";
 import UserDetailsModal from "@/components/user-details-modal";
 import {
   Select,
@@ -20,28 +20,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useGetHomeDataQuery } from "@/redux/feature/homeAPI";
+import {
+  useGetHomeDataByIdQuery,
+  useGetHomeDataQuery,
+} from "@/redux/feature/homeAPI";
 import Loading from "@/components/loading/Loading";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { toPng } from "html-to-image";
 
 interface IUser {
   id: string;
   full_name: string;
   email: string;
   profile_pic: string;
-
 }
 
 export default function DashboardContent() {
-  const { data } = useGetHomeDataQuery({});
-  if (!data) {
-    return (
-      <div>
-        <Loading />
-      </div>
-    );
-  }
+  const { data, isLoading } = useGetHomeDataQuery({});
 
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <main className='w-full p-4 md:p-6'>
@@ -79,11 +78,26 @@ function StatCard({ title, value }: StatCardProps) {
   );
 }
 
+interface DetailRowProps {
+  label: string;
+  value: string;
+}
+
+function DetailRow({ label, value }: DetailRowProps) {
+  return (
+    <div className='flex justify-between border-b border-gray-100 py-2'>
+      <span className='text-gray-600'>{label}</span>
+      <span className='font-medium text-gray-800'>{value}</span>
+    </div>
+  );
+}
+
 function TransactionTable({ user_list }: any) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10); // Configurable items per page
+  const [itemsPerPage] = useState(10);
+  const [userId, setUserId] = useState<string | null>(null);
 
   const transactions = [
     {
@@ -176,15 +190,17 @@ function TransactionTable({ user_list }: any) {
   const totalPages = Math.ceil(transactions.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentTransactions = transactions.slice(startIndex, endIndex);
-  const [selectedYear, setSelectedYear] = useState("2025");
-  const [chartData, setChartData] = useState<
-    { month: string; amount: number }[]
-  >([]);
+  const cardRef = useRef(null);
+
+  const { data: user_details, isLoading } = useGetHomeDataByIdQuery(userId, {
+    skip: !userId,
+  });
 
   const openUserModal = (user: any) => {
     setSelectedUser(user);
     setIsModalOpen(true);
+
+    setUserId(user?.id);
   };
 
   const handlePageChange = (page: number) => {
@@ -193,23 +209,29 @@ function TransactionTable({ user_list }: any) {
     }
   };
 
+  const downloadAsImage = () => {
+    if (!cardRef.current) return;
+
+    toPng(cardRef.current)
+      .then((dataUrl) => {
+        const link = document.createElement("a");
+        link.download = "user-details.png";
+        link.href = dataUrl;
+        link.click();
+      })
+      .catch((err) => {
+        console.error("Failed to generate image", err);
+      });
+  };
+
+  console.log(user_details);
 
   return (
     <>
-      <div className='overflow-hidden rounded-md border border-gray-200'>
+      <div className='overflow-hidden rounded-md'>
         <div className='mb-8'>
           <div className='flex items-center justify-between mb-6'>
             <h2 className='text-[28px] font-medium text-primary'>Earnings</h2>
-            <Select defaultValue='2024'>
-              <SelectTrigger className='w-[180px]'>
-                <SelectValue placeholder='Select Year' />
-              </SelectTrigger>
-              <SelectContent className='outline-none focus:outline-none'>
-                <SelectItem value='2024'>2024 May</SelectItem>
-                <SelectItem value='2023'>2023</SelectItem>
-                <SelectItem value='2022'>2022</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </div>
 
@@ -334,12 +356,74 @@ function TransactionTable({ user_list }: any) {
         </div>
       </div>
 
-      {isModalOpen && selectedUser && (
-        <UserDetailsModal
-          user={selectedUser}
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-        />
+      {isModalOpen && (
+        <div>
+          <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+            <div
+              ref={cardRef}
+              className='relative w-full max-w-md rounded-md bg-white p-6 shadow-lg'
+            >
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className='absolute right-4 top-4 text-gray-500 hover:text-gray-700'
+              >
+                <X className='h-5 w-5' />
+                <span className='sr-only'>Close</span>
+              </button>
+
+              <h2 className='mb-6 text-center text-xl font-semibold text-gray-800'>
+                User Details
+              </h2>
+              <div className='min-h-10'>
+                {isLoading ? (
+                  <Loading />
+                ) : (
+                  <div className='space-y-4'>
+                    <DetailRow label='User ID:' value={user_details?.id} />
+                    <DetailRow
+                      label='Date'
+                      value={user_details?.date_joined?.split("T")[0]}
+                    />
+                    <DetailRow
+                      label='User Name'
+                      value={user_details?.full_name}
+                    />
+                    <DetailRow
+                      label='Occupation'
+                      value={user_details?.occupation}
+                    />
+
+                    {user_details?.mobile_no && (
+                      <DetailRow
+                        label='Mobile'
+                        value={user_details?.mobile_no}
+                      />
+                    )}
+
+                    {user_details?.location && (
+                      <DetailRow
+                        label='Location'
+                        value={user_details?.location}
+                      />
+                    )}
+                    {user_details?.is_verified && (
+                      <DetailRow
+                        label='Varified'
+                        value={user_details?.is_verified ? "Yes ✅" : "No ❌"}
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+              <Button
+                onClick={downloadAsImage}
+                className='mt-6 w-full bg-teal-800 hover:bg-teal-700'
+              >
+                Download
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

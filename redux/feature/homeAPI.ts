@@ -11,7 +11,17 @@ export const homeAPI = baseApi.injectEndpoints({
         providesTags: ["User"],
       }),
     }),
+
+    getHomeDataById: build.query({
+      query: (id) => ({
+        url: `/auth/specific-user/${id}/`,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        providesTags: ["User"],
+      }),
+    }),
   }),
 });
 
-export const { useGetHomeDataQuery } = homeAPI;
+export const { useGetHomeDataQuery, useGetHomeDataByIdQuery } = homeAPI;
