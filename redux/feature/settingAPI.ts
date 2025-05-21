@@ -24,7 +24,18 @@ const settingAPI = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Profile"],
     }),
+
+    updatePassword: builder.mutation({
+      query: (data) => ({
+        url: `/auth/update_password/`,
+        method: "POST",
+        body: data,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }),
+    }),
   }),
 });
 
-export const { useGetProfileQuery, useUpdateProfileMutation } = settingAPI;
+export const { useGetProfileQuery, useUpdateProfileMutation , useUpdatePasswordMutation} = settingAPI;

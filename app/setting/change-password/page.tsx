@@ -12,10 +12,11 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import DashboardSidebar from "@/components/dashboard-sidebar";
 import DashboardHeader from "@/components/dashboard-header";
+import { useUpdatePasswordMutation } from "@/redux/feature/settingAPI";
+import { toast } from "sonner";
 
 export default function ChangePasswordPage() {
   const [formData, setFormData] = useState({
-    currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
@@ -25,21 +26,19 @@ export default function ChangePasswordPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
 
+  const [updatePassword] = useUpdatePasswordMutation();
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setError("");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Basic validation
-    if (
-      !formData.currentPassword ||
-      !formData.newPassword ||
-      !formData.confirmPassword
-    ) {
+    if (!formData.newPassword || !formData.confirmPassword) {
       setError("All fields are required");
       return;
     }
@@ -54,11 +53,19 @@ export default function ChangePasswordPage() {
       return;
     }
 
-    // Handle password change
-    console.log("Password change submitted");
-    // Reset form after successful submission
+    const res = await updatePassword({
+      new_password: formData.newPassword,
+      confirm_password: formData.confirmPassword,
+    });
+
+    console.log(res, "res of update password");
+    if (res.error) {
+      toast.error("Something went wrong");
+    } else if (res.data) {
+      toast.success("Password updated successfully!");
+    }
+
     setFormData({
-      currentPassword: "",
       newPassword: "",
       confirmPassword: "",
     });
@@ -88,36 +95,6 @@ export default function ChangePasswordPage() {
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
-
-              <div className='space-y-2'>
-                <Label
-                  htmlFor='currentPassword'
-                  className='text-lg font-medium text-primary'
-                >
-                  Current Password
-                </Label>
-                <div className='relative'>
-                  <Input
-                    id='currentPassword'
-                    name='currentPassword'
-                    type={showCurrentPassword ? "text" : "password"}
-                    value={formData.currentPassword}
-                    onChange={handleChange}
-                    className='text-lg font-medium text-primary'
-                  />
-                  <button
-                    type='button'
-                    className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-500'
-                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                  >
-                    {showCurrentPassword ? (
-                      <EyeOff size={18} />
-                    ) : (
-                      <Eye size={18} />
-                    )}
-                  </button>
-                </div>
-              </div>
 
               <div className='space-y-2'>
                 <Label
