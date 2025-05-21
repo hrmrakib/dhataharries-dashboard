@@ -35,7 +35,34 @@ const settingAPI = baseApi.injectEndpoints({
         },
       }),
     }),
+
+    getTermsAndConditions: builder.query({
+      query: () => ({
+        url: `/dicipline/terms-conditions/`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }),
+    }),
+
+    setTermsAndConditions: builder.mutation({
+      query: (data) => ({
+        url: `/dicipline/terms-conditions/`,
+        method: "POST",
+        body: data,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }),
+    }),
   }),
 });
 
-export const { useGetProfileQuery, useUpdateProfileMutation , useUpdatePasswordMutation} = settingAPI;
+export const {
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+  useUpdatePasswordMutation,
+  useGetTermsAndConditionsQuery,
+  useSetTermsAndConditionsMutation,
+} = settingAPI;
