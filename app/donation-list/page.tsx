@@ -9,11 +9,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import UserDetailsModal from "@/components/user-details-modal";
 import Loading from "@/components/loading/Loading";
 import { useGetDonationDataQuery } from "@/redux/feature/donationAPI";
-import { Info } from "lucide-react";
+import { Info, X } from "lucide-react";
+import { toPng } from "html-to-image";
 
 interface IUser {
   full_name: string;
@@ -146,16 +147,34 @@ function TransactionTable({ donation_list }: any) {
   const [chartData, setChartData] = useState<
     { month: string; amount: number }[]
   >([]);
+  const cardRef = useRef(null);
+  const [id, setId] = useState(null);
 
   const openUserModal = (user: any) => {
     setSelectedUser(user);
     setIsModalOpen(true);
+    console.log(user)
   };
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
+  };
+
+  const downloadAsImage = () => {
+    if (!cardRef.current) return;
+
+    toPng(cardRef.current)
+      .then((dataUrl) => {
+        const link = document.createElement("a");
+        link.download = "user-details.png";
+        link.href = dataUrl;
+        link.click();
+      })
+      .catch((err) => {
+        console.error("Failed to generate image", err);
+      });
   };
 
   console.log("donation_list", donation_list);
@@ -289,12 +308,75 @@ function TransactionTable({ donation_list }: any) {
         </div>
       </div>
 
-      {isModalOpen && selectedUser && (
-        <UserDetailsModal
-          data={selectedUser}
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-        />
+      {isModalOpen && (
+        <div>
+          <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+            <div
+              ref={cardRef}
+              className='relative w-full max-w-md rounded-md bg-white p-6 shadow-lg'
+            >
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className='absolute right-4 top-4 text-gray-500 hover:text-gray-700'
+              >
+                <X className='h-5 w-5' />
+                <span className='sr-only'>Close</span>
+              </button>
+
+              <h2 className='mb-6 text-center text-xl font-semibold text-gray-800'>
+                User Details
+              </h2>
+
+              {/* <div className='min-h-10'>
+                {isLoading ? (
+                  <Loading />
+                ) : (
+                  <div className='space-y-4'>
+                    <DetailRow label='User ID:' value={user_details?.id} />
+                    <DetailRow
+                      label='Date'
+                      value={user_details?.date_joined?.split("T")[0]}
+                    />
+                    <DetailRow
+                      label='User Name'
+                      value={user_details?.full_name}
+                    />
+                    <DetailRow
+                      label='Occupation'
+                      value={user_details?.occupation}
+                    />
+
+                    {user_details?.mobile_no && (
+                      <DetailRow
+                        label='Mobile'
+                        value={user_details?.mobile_no}
+                      />
+                    )}
+
+                    {user_details?.location && (
+                      <DetailRow
+                        label='Location'
+                        value={user_details?.location}
+                      />
+                    )}
+                    {user_details?.is_verified && (
+                      <DetailRow
+                        label='Varified'
+                        value={user_details?.is_verified ? "Yes ✅" : "No ❌"}
+                      />
+                    )}
+                  </div>
+                )}
+              </div> */}
+              <Button
+                onClick={downloadAsImage}
+                className='mt-6 w-full bg-teal-800 hover:bg-teal-700'
+              >
+                Download
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

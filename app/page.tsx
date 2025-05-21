@@ -11,15 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { use, useRef, useState } from "react";
-import UserDetailsModal from "@/components/user-details-modal";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useRef, useState } from "react";
 import {
   useGetHomeDataByIdQuery,
   useGetHomeDataQuery,
@@ -99,95 +91,8 @@ function TransactionTable({ user_list }: any) {
   const [itemsPerPage] = useState(10);
   const [userId, setUserId] = useState<string | null>(null);
 
-  const transactions = [
-    {
-      id: 447,
-      name: "Marvin McKinney",
-      subscription: "Basic",
-      date: "1 Feb, 2020",
-      amount: "$45",
-    },
-    {
-      id: 426,
-      name: "Jane Cooper",
-      subscription: "Premium",
-      date: "21 Sep, 2020",
-      amount: "$75",
-    },
-    {
-      id: 922,
-      name: "Esther Howard",
-      subscription: "Basic",
-      date: "24 May, 2020",
-      amount: "$45",
-    },
-    {
-      id: 816,
-      name: "Darlene Robertson",
-      subscription: "Premium",
-      date: "24 May, 2020",
-      amount: "$75",
-    },
-    {
-      id: 185,
-      name: "Cameron Williamson",
-      subscription: "Basic",
-      date: "17 Oct, 2020",
-      amount: "$45",
-    },
-    {
-      id: 738,
-      name: "Ronald Richards",
-      subscription: "Basic",
-      date: "1 Feb, 2020",
-      amount: "$45",
-    },
-    {
-      id: 600,
-      name: "Jerome Bell",
-      subscription: "Premium",
-      date: "21 Sep, 2020",
-      amount: "$75",
-    },
-    {
-      id: 583,
-      name: "Dianne Russell",
-      subscription: "Basic",
-      date: "8 Sep, 2020",
-      amount: "$45",
-    },
-    {
-      id: 177,
-      name: "Bessie Cooper",
-      subscription: "Basic",
-      date: "21 Sep, 2020",
-      amount: "$45",
-    },
-    {
-      id: 826,
-      name: "Robert Fox",
-      subscription: "Premium",
-      date: "22 Oct, 2020",
-      amount: "$75",
-    },
-    {
-      id: 540,
-      name: "Kathryn Murphy",
-      subscription: "Basic",
-      date: "17 Oct, 2020",
-      amount: "$45",
-    },
-    {
-      id: 274,
-      name: "Leslie Alexander",
-      subscription: "Premium",
-      date: "17 Oct, 2020",
-      amount: "$75",
-    },
-  ];
-
   // Calculate pagination
-  const totalPages = Math.ceil(transactions.length / itemsPerPage);
+  const totalPages = Math.ceil(user_list.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const cardRef = useRef(null);
@@ -231,7 +136,9 @@ function TransactionTable({ user_list }: any) {
       <div className='overflow-hidden rounded-md'>
         <div className='mb-8'>
           <div className='flex items-center justify-between mb-6'>
-            <h2 className='text-[28px] font-medium text-primary'>Earnings</h2>
+            <h2 className='text-[28px] font-medium text-primary'>
+              Recent Users
+            </h2>
           </div>
         </div>
 

@@ -31,10 +31,13 @@ export default function DashboardSidebar() {
   const pathname = usePathname();
 
   const handleLogout = () => {
-    // Perform logout actions here (clear tokens, etc.)
-    console.log("User logged out");
-    // Redirect to login page
-    router.push("/login");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+
+    setTimeout(() => {
+      router.push("/signin");
+    }, 1000);
+    setIsLogoutModalOpen(false);
   };
 
   if (

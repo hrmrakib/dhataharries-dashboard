@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import DashboardSidebar from "@/components/dashboard-sidebar";
 import DashboardHeader from "@/components/dashboard-header";
+import { useGetProfileQuery } from "@/redux/feature/settingAPI";
+import Loading from "@/components/loading/Loading";
 
 export default function PersonalInformationPage() {
   const userData = {
@@ -16,11 +18,18 @@ export default function PersonalInformationPage() {
     profileImage: "/admin.jpg",
   };
 
+  const { data, isLoading } = useGetProfileQuery({});
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  console.log(data);
   return (
-    <div className='flex min-h-screen bg-gray-50'>
+    <div className='flex min-h-screen bg-[#FFFFFF]'>
       <div className='flex-1 w-full'>
         <main className='w-full p-4 md:p-6'>
-          <div className='max-w-3xl mx-auto'>
+          <div className=' mx-auto'>
             <div className='mb-6 flex items-center justify-between'>
               <Link
                 href='/setting'
@@ -31,21 +40,27 @@ export default function PersonalInformationPage() {
                   Personal Information
                 </span>
               </Link>
-              <Link href='/setting/personal-information/edit'>
-                <Button variant='outline' className='flex items-center gap-2'>
+              <Link
+                href='/setting/personal-information/edit'
+                className='bg-primary text-white rounded-md px-4 py-2'
+              >
+                <button className='flex items-center gap-2'>
                   <Edit className='h-4 w-4' />
                   <span>Edit</span>
-                </Button>
+                </button>
               </Link>
             </div>
 
-            <div className='bg-[#ffffff93] rounded-md border border-gray-100 shadow p-6'>
+            <div className='bg-[#ffffff93] rounded-md p-6'>
               <div className='flex flex-col md:flex-row gap-8 mb-6'>
                 {/* Profile Photo Section */}
-                <div className='w-full md:w-64 flex flex-col items-center'>
+                <div className='w-full md:w-64 flex flex-col items-center border border-gray-600 rounded-md px-6 py-10'>
                   <div className='w-32 h-32 rounded-full overflow-hidden relative mb-3'>
                     <Image
-                      src={userData.profileImage || "/admin.jpg"}
+                      src={
+                        `${process.env.NEXT_PUBLIC_IMAGE_URL}${data?.profile_pic}` ||
+                        "/admin.jpg"
+                      }
                       alt='Profile'
                       fill
                       className='object-cover'
@@ -58,11 +73,11 @@ export default function PersonalInformationPage() {
                 </div>
 
                 {/* User Information Section */}
-                <div className='flex-1 space-y-4'>
+                <div className='flex-1 space-y-12'>
                   <div className='grid grid-cols-1 md:grid-cols-3 gap-4 py-3 border-b border-gray-100'>
                     <div className='text-lg font-medium text-primary'>Name</div>
                     <div className='md:col-span-2 text-lg  text-primary'>
-                      {userData.name}
+                      {data?.full_name}
                     </div>
                   </div>
 
@@ -71,7 +86,7 @@ export default function PersonalInformationPage() {
                       Email
                     </div>
                     <div className='md:col-span-2 text-lg text-primary'>
-                      {userData.email}
+                      {data?.email}
                     </div>
                   </div>
 
@@ -80,7 +95,7 @@ export default function PersonalInformationPage() {
                       Phone Number
                     </div>
                     <div className='md:col-span-2 text-lg text-primary'>
-                      {userData.phone}
+                      {data?.mobile_no}
                     </div>
                   </div>
                 </div>

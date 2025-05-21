@@ -1,46 +1,51 @@
 "use client";
 
 import type React from "react";
-
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import DashboardSidebar from "@/components/dashboard-sidebar";
-import DashboardHeader from "@/components/dashboard-header";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import Loading from "@/components/loading/Loading";
+import {
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+} from "@/redux/feature/settingAPI";
 
 export default function PersonalInformationEditPage() {
   const [formData, setFormData] = useState({
-    name: "Sharon",
-    email: "alkhahiaksaikgkgaik@hmail.com",
-    phone: "alkhahiaksaikgkgaik@hmail.com",
-    countryCode: "+1242",
+    name: "",
+    email: "",
+    phone: "",
+    countryCode: "",
   });
 
-  const [profileImage, setProfileImage] = useState<string>("/admin.jpg");
+  const [profileImage, setProfileImage] = useState<File | string>("/admin.jpg");
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [phone, setPhone] = useState("");
+
+  const { data, isLoading } = useGetProfileQuery({});
+  const [updateProfile] = useUpdateProfileMutation();
+
+  useEffect(() => {
+    if (data) {
+      setFormData({
+        name: data.full_name || "",
+        email: data.email || "",
+        phone: data.mobile_no || "",
+        countryCode: data.countryCode || "",
+      });
+      setProfileImage(data.profile_pic || "/admin.jpg");
+    }
+  }, [data]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleCountryCodeChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, countryCode: value }));
   };
 
   const handleImageClick = () => {
@@ -50,28 +55,44 @@ export default function PersonalInformationEditPage() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setProfileImage(file);
       const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          setProfileImage(event.target.result as string);
-        }
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log("Updated personal information:", { ...formData, profileImage });
-    // Show success message or handle errors
+
+    const formDataToSubmit = new FormData();
+    formDataToSubmit.append("full_name", formData.name);
+    formDataToSubmit.append("email", formData.email);
+    formDataToSubmit.append("mobile_no", formData.phone);
+
+    if (profileImage instanceof File) {
+      formDataToSubmit.append("profile_pic", profileImage);
+    }
+
+    const res = await updateProfile(formDataToSubmit);
+    console.log(res);
   };
 
+  if (isLoading) return <Loading />;
+
+  const displayImage =
+    imagePreview ||
+    (typeof profileImage === "string"
+      ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${profileImage}`
+      : "/admin.jpg");
+
   return (
-    <div className='flex bg-gray-50'>
+    <div className='flex min-h-screen bg-[#FFFFFF]'>
       <div className='flex-1 w-full'>
-        <main className='w-full p-4 md:p-6'>
-          <div className='max-w-3xl mx-auto'>
+        <main className='bg-[#FAFAFA] w-full p-4 md:p-6'>
+          <div className='mx-auto'>
             <div className='mb-6'>
               <Link
                 href='/setting/personal-information'
@@ -87,14 +108,14 @@ export default function PersonalInformationEditPage() {
             <form onSubmit={handleSubmit} className='space-y-6'>
               <div className='flex flex-col md:flex-row gap-8'>
                 {/* Profile Image Section */}
-                <div className='w-full md:w-64 flex flex-col items-center border border-gray-200 rounded-md p-6 bg-white'>
+                <div className='w-full md:w-64 flex flex-col items-center border border-gray-600 rounded-md p-6'>
                   <div
                     className='relative mb-4 cursor-pointer'
                     onClick={handleImageClick}
                   >
                     <div className='w-32 h-32 rounded-full overflow-hidden relative'>
                       <Image
-                        src={profileImage || "/admin.jpg"}
+                        src={displayImage}
                         alt='Profile'
                         fill
                         className='object-cover'
@@ -112,7 +133,9 @@ export default function PersonalInformationEditPage() {
                     />
                   </div>
                   <span className='text-sm text-gray-600'>Profile</span>
-                  <span className='font-medium text-gray-800'>Admin</span>
+                  <span className='font-medium text-gray-800'>
+                    {formData.name || "Admin"}
+                  </span>
                 </div>
 
                 {/* Form Fields Section */}
@@ -157,28 +180,26 @@ export default function PersonalInformationEditPage() {
                     >
                       Phone Number
                     </Label>
-                    <div className='w-full'>
-                      <PhoneInput
-                        country={"us"}
-                        value={phone}
-                        onChange={(phone) => setPhone(phone)}
-                        containerClass='w-full' // Ensures the entire component takes full width
-                        inputClass='w-full h-[100px] p-2 border border-[#760C2A] rounded-md text-5xl font-semibold text-[#760C2A]' // Ensures input field spans full width
-                        buttonClass='border-[#760C2A]' // Optional: styles for the country dropdown button
-                        inputStyle={{
-                          width: "100%",
-                          height: "40px",
-                          border: "1px solid #760C2A",
-                        }} // Inline style fallback if inputClass fails
-                        placeholder='Enter phone number'
-                      />
-                    </div>
+                    <PhoneInput
+                      country={"us"}
+                      value={formData.phone}
+                      onChange={(phone) => setFormData({ ...formData, phone })}
+                      containerClass='w-full'
+                      inputClass='w-full h-[100px] p-2 border border-[#760C2A] rounded-md text-5xl font-semibold text-[#760C2A]'
+                      buttonClass='border-[#760C2A]'
+                      inputStyle={{
+                        width: "100%",
+                        height: "40px",
+                        border: "1px solid #760C2A",
+                      }}
+                      placeholder='Enter phone number'
+                    />
                   </div>
                 </div>
               </div>
 
               <div className='flex justify-end'>
-                <Button type='submit' className='bg-teal-800 hover:bg-teal-700'>
+                <Button type='submit' className='bg-primary hover:bg-teal-700'>
                   Save Changes
                 </Button>
               </div>

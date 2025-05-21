@@ -56,7 +56,7 @@ export default function EditPost() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImage(file);
+      setImage(file); 
       const reader = new FileReader();
 
       reader.onloadend = () => {

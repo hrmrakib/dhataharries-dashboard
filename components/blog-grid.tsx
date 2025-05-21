@@ -102,107 +102,61 @@ export default function BlogGrid() {
     console.log({ res });
   };
 
-  console.log(data);
+  console.log(data.length);
 
   return (
-    <div className='container mx-auto'>
-      <Tabs defaultValue='all' onValueChange={setActiveTab}>
-        <TabsList className='mb-6'>
-          <TabsTrigger
-            value='all'
-            className='bg-pink-900 text-white data-[state=active]:bg-pink-900 data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:text-pink-900'
-          >
-            All Blogs
-          </TabsTrigger>
-          <TabsTrigger
-            value='deleted'
-            className='bg-white text-pink-900 data-[state=active]:bg-white data-[state=active]:text-pink-900'
-          >
-            Deleted
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value='all' className='mt-0'>
-          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
-            {data.map((blog: IBlog) => (
-              <div className='bg-white rounded-lg p-6 relative'>
-                <div className='flex justify-between items-start mb-4'>
-                  <div className='flex items-center'>
-                    <div className='relative h-16 w-16 rounded-full overflow-hidden'>
-                      <Image
-                        src={blog.image || "/placeholder.svg"}
-                        alt={`author`}
-                        fill
-                        className='object-cover'
-                      />
-                    </div>
-                    {/* {blog.isDeleted && (
-                      <Badge className='absolute top-2 left-20 bg-white text-pink-900 border border-pink-900'>
-                        Deleted
-                      </Badge>
-                    )} */}
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant='ghost' size='icon' className='h-8 w-8'>
-                        <MoreVertical className='h-4 w-4' />
-                        <span className='sr-only'>Open menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align='end'>
-                      <DropdownMenuItem
-                        onClick={() => handleBlogDelete(blog.id)}
-                      >
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-
-                <div className='space-y-1'>
-                  <h3 className='font-bold text-lg'>{blog.author_name}</h3>
-                  <p className='text-base font-medium text-[#566063]'>
-                    {blog?.title}
-                  </p>
-                  <p className='text-sm mt-2'>
-                    {expanded
-                      ? blog?.description
-                      : `${blog?.description?.substring(0, 120)}...`}
-                    <button
-                      onClick={() => setExpanded(!expanded)}
-                      className='text-gray-500 ml-1 hover:text-gray-700'
-                    >
-                      {expanded ? "less" : "more"}
-                    </button>
-                  </p>
+    <div className='w-full containe mx-auto'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4'>
+        {data.map((blog: IBlog) => (
+          <div className='bg-white rounded-lg p-6 relative'>
+            <div className='flex justify-between items-start mb-4'>
+              <div className='flex items-center'>
+                <div className='relative h-16 w-16 rounded-full overflow-hidden'>
+                  <Image
+                    src={blog.image || "/placeholder.svg"}
+                    alt={`author`}
+                    fill
+                    className='object-cover'
+                  />
                 </div>
               </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant='ghost' size='icon' className='h-8 w-8'>
+                    <MoreVertical className='h-4 w-4' />
+                    <span className='sr-only'>Open menu</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='end'>
+                  <DropdownMenuItem onClick={() => handleBlogDelete(blog.id)}>
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
 
-              // <BlogCard
-              //   key={blog.id}
-              //   blog={blog}
-              //   onToggleDelete={handleToggleDelete}
-              // />
-            ))}
+            <div className='space-y-1'>
+              <h3 className='font-bold text-lg'>{blog.author_name}</h3>
+              <p className='text-base font-medium text-[#566063]'>
+                {blog?.title}
+              </p>
+              <p className='text-sm mt-2'>
+                {expanded
+                  ? blog?.description
+                  : `${blog?.description?.substring(0, 120)}...`}
+                <button
+                  onClick={() => setExpanded(!expanded)}
+                  className='text-gray-500 ml-1 hover:text-gray-700'
+                >
+                  {expanded ? "less" : "more"}
+                </button>
+              </p>
+            </div>
           </div>
-        </TabsContent>
+        ))}
+      </div>
 
-        {/* Deleted Tab Contant  */}
-
-        {/* <TabsContent value='deleted' className='mt-0'>
-          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
-            {currentBlogs.map((blog) => (
-              <BlogCard
-                key={blog.id}
-                blog={blog}
-                onToggleDelete={handleToggleDelete}
-              />
-            ))}
-          </div>
-        </TabsContent> */}
-      </Tabs>
-
-      {totalPages > 1 && (
+      {totalPages > 1 && data.length > 12 && (
         <div className='mt-8 flex justify-center'>
           <Pagination>
             <PaginationContent>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Info } from "lucide-react";
+import { Info, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -11,26 +11,33 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState } from "react";
-import UserDetailsModal from "@/components/user-details-modal";
+import { useRef, useState } from "react";
+import {
+  useGetHomeDataByIdQuery,
+  useGetHomeDataQuery,
+} from "@/redux/feature/homeAPI";
+import Loading from "@/components/loading/Loading";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { toPng } from "html-to-image";
+
+interface IUser {
+  id: string;
+  full_name: string;
+  email: string;
+  profile_pic: string;
+}
 
 export default function DashboardContent() {
+  const { data, isLoading } = useGetHomeDataQuery({});
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <main className='w-full p-4 md:p-6'>
-      <section className='mb-8'>
-        <h2 className='mb-4 text-[32px] font-medium text-primary'>Overview</h2>
-        <div className='md:container mx-auto'>
-          <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-            <StatCard title='Total Earnings' value='$12300' />
-            <StatCard title='Total User' value='520' />
-            <StatCard title='Total Subscriptions' value='1430' />
-          </div>
-        </div>
-      </section>
-
       <section>
-        <h2 className='mb-4 text-xl font-medium text-gray-800'>Transaction</h2>
-        <TransactionTable />
+        <TransactionTable user_list={data?.user_list} />
       </section>
     </main>
   );
@@ -52,108 +59,42 @@ function StatCard({ title, value }: StatCardProps) {
   );
 }
 
-function TransactionTable() {
+interface DetailRowProps {
+  label: string;
+  value: string;
+}
+
+function DetailRow({ label, value }: DetailRowProps) {
+  return (
+    <div className='flex justify-between border-b border-gray-100 py-2'>
+      <span className='text-gray-600'>{label}</span>
+      <span className='font-medium text-gray-800'>{value}</span>
+    </div>
+  );
+}
+
+function TransactionTable({ user_list }: any) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10); // Configurable items per page
-
-  const transactions = [
-    {
-      id: 447,
-      name: "Marvin McKinney",
-      subscription: "Basic",
-      date: "1 Feb, 2020",
-      amount: "$45",
-    },
-    {
-      id: 426,
-      name: "Jane Cooper",
-      subscription: "Premium",
-      date: "21 Sep, 2020",
-      amount: "$75",
-    },
-    {
-      id: 922,
-      name: "Esther Howard",
-      subscription: "Basic",
-      date: "24 May, 2020",
-      amount: "$45",
-    },
-    {
-      id: 816,
-      name: "Darlene Robertson",
-      subscription: "Premium",
-      date: "24 May, 2020",
-      amount: "$75",
-    },
-    {
-      id: 185,
-      name: "Cameron Williamson",
-      subscription: "Basic",
-      date: "17 Oct, 2020",
-      amount: "$45",
-    },
-    {
-      id: 738,
-      name: "Ronald Richards",
-      subscription: "Basic",
-      date: "1 Feb, 2020",
-      amount: "$45",
-    },
-    {
-      id: 600,
-      name: "Jerome Bell",
-      subscription: "Premium",
-      date: "21 Sep, 2020",
-      amount: "$75",
-    },
-    {
-      id: 583,
-      name: "Dianne Russell",
-      subscription: "Basic",
-      date: "8 Sep, 2020",
-      amount: "$45",
-    },
-    {
-      id: 177,
-      name: "Bessie Cooper",
-      subscription: "Basic",
-      date: "21 Sep, 2020",
-      amount: "$45",
-    },
-    {
-      id: 826,
-      name: "Robert Fox",
-      subscription: "Premium",
-      date: "22 Oct, 2020",
-      amount: "$75",
-    },
-    {
-      id: 540,
-      name: "Kathryn Murphy",
-      subscription: "Basic",
-      date: "17 Oct, 2020",
-      amount: "$45",
-    },
-    {
-      id: 274,
-      name: "Leslie Alexander",
-      subscription: "Premium",
-      date: "17 Oct, 2020",
-      amount: "$75",
-    },
-  ];
+  const [itemsPerPage] = useState(10);
+  const [userId, setUserId] = useState<string | null>(null);
 
   // Calculate pagination
-  const totalPages = Math.ceil(transactions.length / itemsPerPage);
+  const totalPages = Math.ceil(user_list.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentTransactions = transactions.slice(startIndex, endIndex);
+  const cardRef = useRef(null);
+
+  const { data: user_details, isLoading } = useGetHomeDataByIdQuery(userId, {
+    skip: !userId,
+  });
 
   const openUserModal = (user: any) => {
     setSelectedUser(user);
     setIsModalOpen(true);
+
+    setUserId(user?.id);
   };
 
   const handlePageChange = (page: number) => {
@@ -162,37 +103,74 @@ function TransactionTable() {
     }
   };
 
+  const downloadAsImage = () => {
+    if (!cardRef.current) return;
+
+    toPng(cardRef.current)
+      .then((dataUrl) => {
+        const link = document.createElement("a");
+        link.download = "user-details.png";
+        link.href = dataUrl;
+        link.click();
+      })
+      .catch((err) => {
+        console.error("Failed to generate image", err);
+      });
+  };
+
+  console.log(user_details);
+
   return (
     <>
-      <div className='overflow-hidden rounded-md border border-gray-200'>
+      <div className='overflow-hidden rounded-md'>
+        <div className='mb-8'>
+          <div className='flex items-center justify-between mb-6'>
+            <h2 className='text-[28px] font-medium text-primary'>
+              Total Users
+            </h2>
+          </div>
+        </div>
+
         <div className='overflow-x-auto'>
           <Table>
-            <TableHeader className='bg-[#760C2A] text-white'>
+            <TableHeader className='bg-[#760C2A] hover:!bg-[#760C2A] text-white'>
               <TableRow>
                 <TableHead className='text-white'>#Tr.ID</TableHead>
                 <TableHead className='text-white'>User Name</TableHead>
-                <TableHead className='text-white'>Subscription</TableHead>
+                <TableHead className='text-white'>Email</TableHead>
                 <TableHead className='text-white'>Join Date</TableHead>
                 <TableHead className='text-center text-white'>Action</TableHead>
               </TableRow>
             </TableHeader>
+
             <TableBody>
-              {currentTransactions.map((transaction) => (
-                <TableRow key={transaction.id}>
-                  <TableCell className='font-medium'>
-                    {transaction.id}
+              {user_list?.map((user: IUser) => (
+                <TableRow key={user?.id}>
+                  <TableCell className='font-medium text-lg text-primary'>
+                    {user?.id}
                   </TableCell>
-                  <TableCell>{transaction.name}</TableCell>
-                  <TableCell>{transaction.subscription}</TableCell>
-                  <TableCell>{transaction.date}</TableCell>
-                  <TableCell className='text-center'>
+                  <TableCell className='text-lg text-primary'>
+                    {user?.full_name}
+                  </TableCell>
+                  <TableCell className='text-lg text-primary'>
+                    {user?.email}
+                  </TableCell>
+                  <TableCell className='text-lg text-primary'>
+                    <Avatar>
+                      <AvatarImage
+                        src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${user?.profile_pic}`}
+                      />
+                      <AvatarFallback>{user?.full_name}</AvatarFallback>
+                    </Avatar>
+                  </TableCell>
+                  <TableCell className='text-center text-lg text-primary'>
                     <Button
                       variant='ghost'
                       size='sm'
                       className='h-8 w-8 p-0'
-                      onClick={() => openUserModal(transaction)}
+                      onClick={() => openUserModal(user)}
                     >
-                      <Info className='h-4 w-4' />
+                      <Info className='h-6 w-6' />
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -236,7 +214,7 @@ function TransactionTable() {
                   variant={page === currentPage ? "default" : "outline"}
                   size='sm'
                   className={`h-8 w-8 p-0 ${
-                    page === currentPage ? "bg-[#760C2A] text-white" : ""
+                    page === currentPage ? "bg-teal-800 text-white" : ""
                   }`}
                   onClick={() => handlePageChange(page)}
                 >
@@ -274,12 +252,74 @@ function TransactionTable() {
         </div>
       </div>
 
-      {isModalOpen && selectedUser && (
-        <UserDetailsModal
-          user={selectedUser}
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-        />
+      {isModalOpen && (
+        <div>
+          <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+            <div
+              ref={cardRef}
+              className='relative w-full max-w-md rounded-md bg-white p-6 shadow-lg'
+            >
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className='absolute right-4 top-4 text-gray-500 hover:text-gray-700'
+              >
+                <X className='h-5 w-5' />
+                <span className='sr-only'>Close</span>
+              </button>
+
+              <h2 className='mb-6 text-center text-xl font-semibold text-gray-800'>
+                User Details
+              </h2>
+              <div className='min-h-10'>
+                {isLoading ? (
+                  <Loading />
+                ) : (
+                  <div className='space-y-4'>
+                    <DetailRow label='User ID:' value={user_details?.id} />
+                    <DetailRow
+                      label='Date'
+                      value={user_details?.date_joined?.split("T")[0]}
+                    />
+                    <DetailRow
+                      label='User Name'
+                      value={user_details?.full_name}
+                    />
+                    <DetailRow
+                      label='Occupation'
+                      value={user_details?.occupation}
+                    />
+
+                    {user_details?.mobile_no && (
+                      <DetailRow
+                        label='Mobile'
+                        value={user_details?.mobile_no}
+                      />
+                    )}
+
+                    {user_details?.location && (
+                      <DetailRow
+                        label='Location'
+                        value={user_details?.location}
+                      />
+                    )}
+                    {user_details?.is_verified && (
+                      <DetailRow
+                        label='Varified'
+                        value={user_details?.is_verified ? "Yes ✅" : "No ❌"}
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+              <Button
+                onClick={downloadAsImage}
+                className='mt-6 w-full bg-teal-800 hover:bg-teal-700'
+              >
+                Download
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );
