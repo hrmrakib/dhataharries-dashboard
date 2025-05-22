@@ -12,9 +12,13 @@ import {
 import { useRef, useState } from "react";
 import UserDetailsModal from "@/components/user-details-modal";
 import Loading from "@/components/loading/Loading";
-import { useGetDonationDataQuery } from "@/redux/feature/donationAPI";
+import {
+  useGetDonationDataByIdQuery,
+  useGetDonationDataQuery,
+} from "@/redux/feature/donationAPI";
 import { Info, X } from "lucide-react";
 import { toPng } from "html-to-image";
+import { set } from "date-fns";
 
 interface IUser {
   full_name: string;
@@ -42,6 +46,20 @@ export default function DashboardContent() {
         <TransactionTable donation_list={data} />
       </section>
     </main>
+  );
+}
+
+interface DetailRowProps {
+  label: string;
+  value: string;
+}
+
+function DetailRow({ label, value }: DetailRowProps) {
+  return (
+    <div className='flex justify-between border-b border-gray-100 py-2'>
+      <span className='text-gray-600'>{label}</span>
+      <span className='font-medium text-gray-800'>{value}</span>
+    </div>
   );
 }
 
@@ -147,10 +165,16 @@ function TransactionTable({ donation_list }: any) {
   const cardRef = useRef(null);
   const [id, setId] = useState(null);
 
+  const { data: donation_details, isLoading } = useGetDonationDataByIdQuery(id);
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
   const openUserModal = (user: any) => {
     setSelectedUser(user);
     setIsModalOpen(true);
-    console.log(user);
+    setId(user.donation_id);
   };
 
   const handlePageChange = (page: number) => {
@@ -174,7 +198,7 @@ function TransactionTable({ donation_list }: any) {
       });
   };
 
-  console.log("donation_list", donation_list);
+  console.log("donation_details", donation_details);
   return (
     <>
       <div className='overflow-hidden rounded-md'>
@@ -321,50 +345,52 @@ function TransactionTable({ donation_list }: any) {
               </button>
 
               <h2 className='mb-6 text-center text-xl font-semibold text-gray-800'>
-                User Details
+                Donation Details
               </h2>
 
-              {/* <div className='min-h-10'>
+              <div className='min-h-10'>
                 {isLoading ? (
                   <Loading />
                 ) : (
                   <div className='space-y-4'>
-                    <DetailRow label='User ID:' value={user_details?.id} />
                     <DetailRow
-                      label='Date'
-                      value={user_details?.date_joined?.split("T")[0]}
+                      label='Donation ID:'
+                      value={donation_details?.donation_id}
                     />
                     <DetailRow
-                      label='User Name'
-                      value={user_details?.full_name}
+                      label='Donator Name'
+                      value={donation_details?.full_name}
                     />
+                    <DetailRow label='Email' value={donation_details?.email} />
                     <DetailRow
-                      label='Occupation'
-                      value={user_details?.occupation}
+                      label='Location'
+                      value={donation_details?.location}
                     />
 
-                    {user_details?.mobile_no && (
+                    {donation_details?.mobile_no && (
                       <DetailRow
-                        label='Mobile'
-                        value={user_details?.mobile_no}
+                        label='Amount'
+                        value={donation_details?.amount}
                       />
                     )}
 
-                    {user_details?.location && (
+                    {donation_details?.location && (
                       <DetailRow
-                        label='Location'
-                        value={user_details?.location}
+                        label='Status'
+                        value={donation_details?.payment_status}
                       />
                     )}
-                    {user_details?.is_verified && (
+                    {donation_details?.is_verified && (
                       <DetailRow
                         label='Varified'
-                        value={user_details?.is_verified ? "Yes ✅" : "No ❌"}
+                        value={
+                          donation_details?.is_verified ? "Yes ✅" : "No ❌"
+                        }
                       />
                     )}
                   </div>
                 )}
-              </div> */}
+              </div>
               <Button
                 onClick={downloadAsImage}
                 className='mt-6 w-full bg-teal-800 hover:bg-teal-700'

@@ -13,7 +13,6 @@ export const metadata: Metadata = {
   generator: "dev",
 };
 
-const username = "Arjun";
 
 export default function RootLayout({
   children,
@@ -29,7 +28,7 @@ export default function RootLayout({
             <div className='flex min-h-screen bg-gray-50 w-full'>
               <DashboardSidebar />
               <div className='flex-1 w-full bg-[#FFF0F4]'>
-                <DashboardHeader username={username} />
+                <DashboardHeader  />
                 {children}
               </div>
             </div>

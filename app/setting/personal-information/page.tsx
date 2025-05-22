@@ -85,7 +85,9 @@ export default function PersonalInformationPage() {
                     <div className='text-lg font-medium text-primary'>
                       Email
                     </div>
-                    <div className='text-lg text-primary px-2 py-3 rounded-md border border-gray-500'>{data?.email}</div>
+                    <div className='text-lg text-primary px-2 py-3 rounded-md border border-gray-500'>
+                      {data?.email}
+                    </div>
                   </div>
 
                   <div className='flex flex-col gap-1'>

@@ -12,7 +12,19 @@ const donationAPI = baseApi.injectEndpoints({
       }),
       providesTags: ["Donation"],
     }),
+
+    getDonationDataById: builder.query({
+      query: (id) => ({
+        url: `/donation/donator/${id}/`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }),
+      providesTags: ["Donation"],
+    }),
   }),
 });
 
-export const { useGetDonationDataQuery } = donationAPI;
+export const { useGetDonationDataQuery, useGetDonationDataByIdQuery } =
+  donationAPI;

@@ -6,13 +6,16 @@ import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useGetProfileQuery } from "@/redux/feature/settingAPI";
+import Loading from "./loading/Loading";
 
-interface DashboardHeaderProps {
-  username: string;
-}
-
-export default function DashboardHeader({ username }: DashboardHeaderProps) {
+export default function DashboardHeader() {
   const pathname = usePathname();
+  const { data, isLoading } = useGetProfileQuery({});
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   if (
     pathname === "/signin" ||
@@ -24,12 +27,15 @@ export default function DashboardHeader({ username }: DashboardHeaderProps) {
   ) {
     return null;
   }
+
+  console.log(data);
+
   return (
     <header className='w-[98%] mx-auto sticky top-0 z-20 flex h-[72px] items-center justify-between bg-[#760C2A] px-4 text-white rounded md:px-6 my-6'>
       <div className='flex items-center gap-4'>
         <SidebarTrigger className='text-white md:hidden' />
         <div>
-          <h1 className='text-2xl font-medium'>Welcome, {username}</h1>
+          <h1 className='text-2xl font-medium'>Welcome, {data?.full_name}</h1>
           <p className='text-sm opacity-80'>Have a nice day</p>
         </div>
       </div>
@@ -43,11 +49,14 @@ export default function DashboardHeader({ username }: DashboardHeaderProps) {
         <div className='flex items-center gap-2'>
           <Link href='/setting/personal-information'>
             <Avatar>
-              <AvatarImage src='/user.jpg' alt={username} />
-              <AvatarFallback>{username.charAt(0)}</AvatarFallback>
+              <AvatarImage
+                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${data?.profile_pic}`}
+                alt={data?.full_name}
+              />
+              <AvatarFallback>{data?.full_name}</AvatarFallback>
             </Avatar>
           </Link>
-          <span className='hidden md:inline'>{username}</span>
+          <span className='hidden md:inline'>{data?.full_name}</span>
         </div>
       </div>
     </header>
