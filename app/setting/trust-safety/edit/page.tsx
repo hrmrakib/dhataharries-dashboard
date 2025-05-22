@@ -5,27 +5,22 @@ import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import { Button } from "@/components/ui/button";
 import {
-  useGetPrivacyPolicyQuery,
-  useSetPrivacyPolicyMutation,
-  useSetTermsAndConditionsMutation,
+  useGetTrustAndSafetyQuery,
+  useSetTrustAndSafetyMutation,
 } from "@/redux/feature/settingAPI";
 import Loading from "@/components/loading/Loading";
 import { useRouter } from "next/navigation";
 
-const EditPrivacyPolicy = () => {
+const TrustAndSafetyPage = () => {
   const editorRef = useRef<HTMLDivElement>(null);
   const quillRef = useRef<Quill | null>(null);
   const [content, setContent] = useState<string>("");
   const router = useRouter();
 
-  const {
-    data: privacyPolicy,
-    isLoading,
-    refetch,
-  } = useGetPrivacyPolicyQuery({});
+  const { data: trustAndSafety, isLoading } = useGetTrustAndSafetyQuery({});
 
-  const [setPrivacyPolicy, { isLoading: isSaving }] =
-    useSetPrivacyPolicyMutation();
+  const [setTrustAndSafety, { isLoading: isSaving }] =
+    useSetTrustAndSafetyMutation();
 
   useEffect(() => {
     let initialized = false;
@@ -44,9 +39,9 @@ const EditPrivacyPolicy = () => {
 
         quillRef.current = quill;
 
-        if (privacyPolicy?.description) {
-          quill.root.innerHTML = privacyPolicy.description;
-          setContent(privacyPolicy.description);
+        if (trustAndSafety?.description) {
+          quill.root.innerHTML = trustAndSafety.description;
+          setContent(trustAndSafety.description);
         }
 
         quill.on("text-change", () => {
@@ -62,16 +57,15 @@ const EditPrivacyPolicy = () => {
     return () => {
       initialized = true;
     };
-  }, [privacyPolicy]);
+  }, [trustAndSafety]);
 
-  if (isLoading && !privacyPolicy && !quillRef.current) return <Loading />;
+  if (isLoading && !trustAndSafety && !quillRef.current) return <Loading />;
 
   const handleSubmit = async () => {
     try {
-      await setPrivacyPolicy({ description: content }).unwrap();
+      await setTrustAndSafety({ description: content }).unwrap();
       alert("Saved!");
-      refetch();
-      router.push("/setting/privacy-policy");
+      router.push("/setting/trust-safety");
     } catch {
       alert("Save failed.");
     }
@@ -102,4 +96,4 @@ const EditPrivacyPolicy = () => {
   );
 };
 
-export default EditPrivacyPolicy;
+export default TrustAndSafetyPage;

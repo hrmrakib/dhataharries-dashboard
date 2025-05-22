@@ -198,7 +198,6 @@ function TransactionTable({ donation_list }: any) {
       });
   };
 
-  console.log("donation_details", donation_details);
   return (
     <>
       <div className='overflow-hidden rounded-md'>

@@ -1,3 +1,4 @@
+import { set } from "date-fns";
 import baseApi from "../api/baseAPI";
 
 const settingAPI = baseApi.injectEndpoints({
@@ -56,6 +57,48 @@ const settingAPI = baseApi.injectEndpoints({
         },
       }),
     }),
+
+    getPrivacyPolicy: builder.query({
+      query: () => ({
+        url: `/dicipline/privacy-policy/`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }),
+    }),
+
+    setPrivacyPolicy: builder.mutation({
+      query: (data) => ({
+        url: `/dicipline/privacy-policy/`,
+        method: "PUT",
+        body: data,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }),
+    }),
+
+    getTrustAndSafety: builder.query({
+      query: () => ({
+        url: `/dicipline/trust-safety/`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }),
+    }),
+
+    setTrustAndSafety: builder.mutation({
+      query: (data) => ({
+        url: `/dicipline/trust-safety/`,
+        method: "PUT",
+        body: data,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }),
+    }),
   }),
 });
 
@@ -65,4 +108,9 @@ export const {
   useUpdatePasswordMutation,
   useGetTermsAndConditionsQuery,
   useSetTermsAndConditionsMutation,
+
+  useGetPrivacyPolicyQuery,
+  useSetPrivacyPolicyMutation,
+  useGetTrustAndSafetyQuery,
+  useSetTrustAndSafetyMutation,
 } = settingAPI;

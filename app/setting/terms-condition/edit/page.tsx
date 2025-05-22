@@ -64,7 +64,6 @@
 //       const res = await setTermsAndConditions({
 //         description: content,
 //       }).unwrap();
-//       console.log("Updated:", res);
 //       alert("Terms and Conditions saved successfully!");
 //     } catch (err) {
 //       console.error(err);

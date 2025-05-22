@@ -100,7 +100,6 @@ export default function BlogGrid() {
   const handleBlogDelete = async (id: number | string) => {
     const res = await deleteBlog(id);
     if (res.error) {
-      console.log("Error deleting blog:", res.error);
     } else {
       refetch();
     }

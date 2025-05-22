@@ -56,7 +56,6 @@ export default function Home() {
     }
   };
 
-  console.log(data);
 
   return (
     <main className='min-h-screen bg-pink-50 p-4 md:p-8'>

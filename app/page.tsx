@@ -129,7 +129,6 @@ function TransactionTable({ user_list }: any) {
       });
   };
 
-  console.log(user_details);
 
   return (
     <>

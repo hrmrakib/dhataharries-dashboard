@@ -9,9 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import DashboardSidebar from "@/components/dashboard-sidebar";
-import DashboardHeader from "@/components/dashboard-header";
 import { useUpdatePasswordMutation } from "@/redux/feature/settingAPI";
 import { toast } from "sonner";
 
@@ -58,7 +55,6 @@ export default function ChangePasswordPage() {
       confirm_password: formData.confirmPassword,
     });
 
-    console.log(res, "res of update password");
     if (res.error) {
       toast.error("Something went wrong");
     } else if (res.data) {

@@ -39,12 +39,7 @@ export default function AddSubscriptionPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle form submission
-    console.log({
-      packageName,
-      packageAmount,
-      packageExpiration,
-      features,
-    });
+   
   };
 
   return (

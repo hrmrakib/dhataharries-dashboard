@@ -83,7 +83,6 @@ export default function EditPost() {
         id: (params.edit as string) || "",
         data: formData,
       });
-      console.log(res, "res of create post");
 
       if (res?.data) {
         toast.success("Post updated successfully!");

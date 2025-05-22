@@ -31,10 +31,9 @@ export default function LoginPage() {
     // Simulate API call
     try {
       const res = await forgotPassword({ email }).unwrap();
-      console.log(res, "res");
+
       // In a real app, you would call your authentication API here
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Login attempted with:", { email });
       toast.success(res?.message || "Email sent successfully!");
       router.push(`/forgetVerify?email=${email}`);
     } catch (error) {

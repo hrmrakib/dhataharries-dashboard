@@ -2,10 +2,19 @@
 
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { useGetPrivacyPolicyQuery } from "@/redux/feature/settingAPI";
+import { useGetTrustAndSafetyQuery } from "@/redux/feature/settingAPI";
+import { useEffect } from "react";
 
-export default function PrivacyPolicyPage() {
-  const { data: privacyPolicy, isLoading } = useGetPrivacyPolicyQuery({});
+export default function TrustAndSafetyPage() {
+  const {
+    data: trustAndSafety,
+    isLoading,
+    refetch,
+  } = useGetTrustAndSafetyQuery({});
+
+  useEffect(() => {
+    refetch();
+  }, [trustAndSafety]);
 
   return (
     <div className='flex min-h-screen bg-gray-50'>
@@ -18,11 +27,11 @@ export default function PrivacyPolicyPage() {
                 className='inline-flex items-center text-primary hover:text-teal-700'
               >
                 <ArrowLeft className='mr-2 h-4 w-4' />
-                <span className='text-xl font-semibold'>Privacy Policy</span>
+                <span className='text-xl font-semibold'>Trust & Safety</span>
               </Link>
 
               <Link
-                href='/setting/privacy-policy/edit'
+                href='/setting/trust-safety/edit'
                 className='inline-flex items-center text-primary hover:text-teal-700 border border-[#760C2A] rounded-md px-4 py-1.5'
               >
                 <span className='text-xl font-semibold'>Edit</span>
@@ -30,17 +39,15 @@ export default function PrivacyPolicyPage() {
             </div>
 
             <div className='prose prose-sm max-w-none'>
-              <h2 className='text-xl font-semibold mb-4'>
-                Terms and Conditions
-              </h2>
+              <h2 className='text-xl font-semibold mb-4'>Trust and Safety</h2>
             </div>
 
             <div>
-              {privacyPolicy?.description ? (
+              {trustAndSafety?.description ? (
                 <div
                   className='prose prose-sm max-w-none'
                   dangerouslySetInnerHTML={{
-                    __html: privacyPolicy?.description,
+                    __html: trustAndSafety.description,
                   }}
                 />
               ) : (

@@ -61,7 +61,6 @@ export default function SignInPage() {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      console.log("Form submitted with data:", formData);
       setSubmitSuccess(true);
 
       // In a real app, you would redirect to dashboard or home page after successful login

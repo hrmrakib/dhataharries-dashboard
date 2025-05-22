@@ -77,7 +77,6 @@ export default function PersonalInformationEditPage() {
     }
 
     const res = await updateProfile(formDataToSubmit);
-    console.log(res);
   };
 
   if (isLoading) return <Loading />;

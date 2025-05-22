@@ -58,7 +58,6 @@ export default function EditPost() {
       const res = await createMSPost({
         data: formData,
       });
-      console.log(res, "res of create post");
 
       if (res?.data) {
         toast.success("Post created successfully!");

@@ -32,11 +32,9 @@ export default function Login() {
     // Simulate API call
     try {
       const res = await login({ email, password }).unwrap();
-      console.log("res", res);
       localStorage.setItem("accessToken", res?.access);
       // In a real app, you would call your authentication API here
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Login attempted with:", { email, password });
       // alert("Login successful!");
       toast.success(res?.message || "Login successful!");
 

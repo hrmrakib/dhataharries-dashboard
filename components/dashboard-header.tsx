@@ -24,7 +24,6 @@ export default function DashboardHeader() {
     return null;
   }
 
-  console.log(data);
 
   return (
     <header className='w-[98%] mx-auto sticky top-0 z-20 flex h-[72px] items-center justify-between bg-[#760C2A] px-4 text-white rounded md:px-6 my-6'>

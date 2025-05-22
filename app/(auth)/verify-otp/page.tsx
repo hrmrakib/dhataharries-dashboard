@@ -14,7 +14,6 @@ function VerifyOTP() {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const searchParams = useSearchParams();
   const userMail = searchParams.get("email") || ""; // Get email from URL query parameter
-  console.log(userMail, "userMail");
   const [verifyEmail] = useVerifyEmailMutation();
 
   // Initialize refs array
@@ -85,11 +84,9 @@ function VerifyOTP() {
         email: userMail,
         otp: otpValue.trim(),
       }).unwrap();
-      console.log(res, "res");
 
       // Simulate API call to verify OTP
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log("Verifying OTP:", otpValue);
       // alert("Email verified successfully!");
       toast.success(res.data?.message || "Email verified successfully!");
       router.push("/sign-in");

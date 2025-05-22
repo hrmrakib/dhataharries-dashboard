@@ -83,7 +83,7 @@ export default function CreatePasswordPage() {
     try {
       // Simulate API call to update password
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log("Password updated:", { password });
+
       alert("Password updated successfully!");
       router.push("/");
       // Redirect to login page or dashboard

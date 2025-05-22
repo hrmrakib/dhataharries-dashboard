@@ -24,7 +24,6 @@ export default function PersonalInformationPage() {
     return <Loading />;
   }
 
-  console.log(data);
   return (
     <div className='flex min-h-screen bg-[#FFFFFF]'>
       <div className='flex-1 w-full'>
