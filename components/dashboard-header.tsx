@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell } from "lucide-react";
+import { Bell, Divide } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -12,10 +12,6 @@ import Loading from "./loading/Loading";
 export default function DashboardHeader() {
   const pathname = usePathname();
   const { data, isLoading } = useGetProfileQuery({});
-
-  if (isLoading) {
-    return <Loading />;
-  }
 
   if (
     pathname === "/signin" ||
@@ -47,15 +43,19 @@ export default function DashboardHeader() {
         </Button>
 
         <div className='flex items-center gap-2'>
-          <Link href='/setting/personal-information'>
-            <Avatar>
-              <AvatarImage
-                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${data?.profile_pic}`}
-                alt={data?.full_name}
-              />
-              <AvatarFallback>{data?.full_name}</AvatarFallback>
-            </Avatar>
-          </Link>
+          {isLoading ? (
+            <div> loading .....</div>
+          ) : (
+            <Link href='/setting/personal-information'>
+              <Avatar>
+                <AvatarImage
+                  src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${data?.profile_pic}`}
+                  alt={data?.full_name}
+                />
+                <AvatarFallback>{data?.full_name}</AvatarFallback>
+              </Avatar>
+            </Link>
+          )}
           <span className='hidden md:inline'>{data?.full_name}</span>
         </div>
       </div>

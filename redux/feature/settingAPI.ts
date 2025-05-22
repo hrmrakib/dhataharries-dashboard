@@ -49,7 +49,7 @@ const settingAPI = baseApi.injectEndpoints({
     setTermsAndConditions: builder.mutation({
       query: (data) => ({
         url: `/dicipline/terms-conditions/`,
-        method: "POST",
+        method: "PUT",
         body: data,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
