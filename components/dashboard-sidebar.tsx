@@ -56,7 +56,7 @@ export default function DashboardSidebar() {
       <div className='!bg-white md:!bg-transparent'>
         <Sidebar className='border-r border-gray-200 fixed left-0 h-full z-30 !bg-white md:!bg-transparent'>
           <SidebarContent>
-            <div className='flex items-center justify-center gap-2 px-4 py-6'>
+            <Link href='/' className='flex items-center justify-center gap-2 px-4 py-6'>
               <Image
                 src='/logo.png'
                 alt='logo'
@@ -64,7 +64,7 @@ export default function DashboardSidebar() {
                 height={140}
                 className=''
               />
-            </div>
+            </Link>
 
             <SidebarMenu className='px-6 space-y-4'>
               <NavItem

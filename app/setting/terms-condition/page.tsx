@@ -7,7 +7,6 @@ import { useGetTermsAndConditionsQuery } from "@/redux/feature/settingAPI";
 export default function TermsConditionPage() {
   const { data: terms, isLoading } = useGetTermsAndConditionsQuery({});
 
-
   return (
     <div className='flex min-h-screen bg-gray-50'>
       <div className='flex-1 w-full'>
@@ -28,12 +27,6 @@ export default function TermsConditionPage() {
               >
                 <span className='text-xl font-semibold'>Edit</span>
               </Link>
-            </div>
-
-            <div className='prose prose-sm max-w-none'>
-              <h2 className='text-xl font-semibold mb-4'>
-                Terms and Conditions
-              </h2>
             </div>
 
             <div>

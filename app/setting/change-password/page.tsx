@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useUpdatePasswordMutation } from "@/redux/feature/settingAPI";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function ChangePasswordPage() {
   const [formData, setFormData] = useState({
@@ -22,6 +23,7 @@ export default function ChangePasswordPage() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
+  const router = useRouter();
 
   const [updatePassword] = useUpdatePasswordMutation();
 
@@ -45,7 +47,7 @@ export default function ChangePasswordPage() {
       return;
     }
 
-    if (formData.newPassword.length < 8) {
+    if (formData.newPassword.length < 6) {
       setError("Password must be at least 8 characters long");
       return;
     }
@@ -60,6 +62,8 @@ export default function ChangePasswordPage() {
     } else if (res.data) {
       toast.success("Password updated successfully!");
     }
+
+    router.push("/setting");
 
     setFormData({
       newPassword: "",

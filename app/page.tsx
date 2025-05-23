@@ -129,7 +129,6 @@ function TransactionTable({ user_list }: any) {
       });
   };
 
-
   return (
     <>
       <div className='overflow-hidden rounded-md'>
@@ -280,24 +279,30 @@ function TransactionTable({ user_list }: any) {
               <h2 className='mb-6 text-center text-xl font-semibold text-gray-800'>
                 User Details
               </h2>
+              
               <div className='min-h-10'>
                 {isLoading ? (
                   <Loading />
                 ) : (
                   <div className='space-y-4'>
                     <DetailRow label='User ID:' value={user_details?.id} />
+
                     <DetailRow
                       label='Date'
                       value={user_details?.date_joined?.split("T")[0]}
                     />
+
                     <DetailRow
                       label='User Name'
                       value={user_details?.full_name}
                     />
-                    <DetailRow
-                      label='Occupation'
-                      value={user_details?.occupation}
-                    />
+
+                    {user_details?.occupation && (
+                      <DetailRow
+                        label='Occupation'
+                        value={user_details?.occupation}
+                      />
+                    )}
 
                     {user_details?.mobile_no && (
                       <DetailRow

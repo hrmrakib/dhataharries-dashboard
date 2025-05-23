@@ -10,6 +10,7 @@ import {
 } from "@/redux/feature/settingAPI";
 import Loading from "@/components/loading/Loading";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const TrustAndSafetyPage = () => {
   const editorRef = useRef<HTMLDivElement>(null);
@@ -63,11 +64,15 @@ const TrustAndSafetyPage = () => {
 
   const handleSubmit = async () => {
     try {
-      await setTrustAndSafety({ description: content }).unwrap();
-      alert("Saved!");
-      router.push("/setting/trust-safety");
+      const res = await setTrustAndSafety({ description: content }).unwrap();
+      if (res?.description) {
+        toast.success("Terms and Conditions saved successfully!");
+        router.push("/setting/terms-condition");
+      } else {
+        toast.error("Failed to save.");
+      }
     } catch {
-      alert("Save failed.");
+      toast.error("Save failed.");
     }
   };
 

@@ -59,7 +59,7 @@ export default function Home() {
 
   return (
     <main className='min-h-screen bg-pink-50 p-4 md:p-8'>
-      <div className='max-w-7xl mx-auto'>
+      <div className='w-full mx-auto'>
         {/* Header with Add Post button */}
         <div className='flex justify-end mb-6'>
           <Link
@@ -72,7 +72,7 @@ export default function Home() {
         </div>
 
         {/* Blog posts grid */}
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
           {data?.map((post: BlogPost) => (
             <div
               key={post.id}

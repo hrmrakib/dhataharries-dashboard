@@ -15,6 +15,7 @@ import {
   useGetProfileQuery,
   useUpdateProfileMutation,
 } from "@/redux/feature/settingAPI";
+import { useRouter } from "next/navigation";
 
 export default function PersonalInformationEditPage() {
   const [formData, setFormData] = useState({
@@ -27,6 +28,7 @@ export default function PersonalInformationEditPage() {
   const [profileImage, setProfileImage] = useState<File | string>("/admin.jpg");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   const { data, isLoading } = useGetProfileQuery({});
   const [updateProfile] = useUpdateProfileMutation();
@@ -77,6 +79,8 @@ export default function PersonalInformationEditPage() {
     }
 
     const res = await updateProfile(formDataToSubmit);
+
+    router.push("/setting/personal-information");
   };
 
   if (isLoading) return <Loading />;

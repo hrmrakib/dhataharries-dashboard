@@ -11,6 +11,7 @@ import {
 } from "@/redux/feature/settingAPI";
 import Loading from "@/components/loading/Loading";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const EditPrivacyPolicy = () => {
   const editorRef = useRef<HTMLDivElement>(null);
@@ -68,12 +69,15 @@ const EditPrivacyPolicy = () => {
 
   const handleSubmit = async () => {
     try {
-      await setPrivacyPolicy({ description: content }).unwrap();
-      alert("Saved!");
-      refetch();
-      router.push("/setting/privacy-policy");
+      const res = await setPrivacyPolicy({ description: content }).unwrap();
+      if (res?.description) {
+        toast.success("Terms and Conditions saved successfully!");
+        router.push("/setting/privacy-policy");
+      } else {
+        toast.error("Failed to save.");
+      }
     } catch {
-      alert("Save failed.");
+      toast.error("Save failed.");
     }
   };
 
