@@ -82,7 +82,7 @@ export default function BlogGrid() {
   );
 
   // Calculate pagination
-  const totalPages = Math.ceil(filteredBlogs.length / BLOGS_PER_PAGE);
+  const totalPages = Math.ceil(filteredBlogs?.length / BLOGS_PER_PAGE);
   const currentBlogs = filteredBlogs.slice(
     (currentPage - 1) * BLOGS_PER_PAGE,
     currentPage * BLOGS_PER_PAGE

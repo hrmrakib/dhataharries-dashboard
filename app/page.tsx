@@ -92,7 +92,7 @@ function TransactionTable({ user_list }: any) {
   const [userId, setUserId] = useState<string | null>(null);
 
   // Calculate pagination
-  const totalPages = Math.ceil(user_list.length / itemsPerPage);
+  const totalPages = Math.ceil(user_list?.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const cardRef = useRef(null);
