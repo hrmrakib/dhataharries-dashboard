@@ -46,7 +46,7 @@ const msPostAPI = baseApi.injectEndpoints({
         },
       }),
       invalidatesTags: ["MsPost"],
-    }),
+    }), 
 
     deleteMSPost: builder.mutation({
       query: (id) => ({

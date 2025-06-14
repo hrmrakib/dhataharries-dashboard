@@ -12,7 +12,10 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { useGetMSPostQuery } from "@/redux/feature/msPostAPI";
+import {
+  useDeleteMSPostMutation,
+  useGetMSPostQuery,
+} from "@/redux/feature/msPostAPI";
 import Loading from "@/components/loading/Loading";
 
 // Sample blog post data
@@ -36,8 +39,8 @@ interface BlogPost {
 export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(allBlogPosts.length / POSTS_PER_PAGE);
-
   const { data, isLoading } = useGetMSPostQuery(undefined);
+  const [deleteMSPost] = useDeleteMSPostMutation({});
 
   if (isLoading) {
     return <Loading />;
@@ -55,7 +58,6 @@ export default function Home() {
       window.scrollTo(0, 0);
     }
   };
-
 
   return (
     <main className='min-h-screen bg-pink-50 p-4 md:p-8'>
@@ -86,19 +88,28 @@ export default function Home() {
                   className='object-cover'
                 />
               </div>
-              <div className='p-4'>
+              <div className='p-4 flex flex-col'>
                 <h2 className='text-2xl text-[#2C383C] font-semibold mb-2 hover:underline'>
                   <Link href={`/posts/${post.id}`}>{post?.title}</Link>
                 </h2>
-                <p className='text-sm text-[#727A7C] mb-4 line-clamp-4'>
+                <p className='text-sm text-[#727A7C] mb-4 line-clamp-4 flex-1'>
                   {post?.description}
                 </p>
-                <Link
-                  href={`/ms-post/${post.id}`}
-                  className='inline-block border border-red-900 text-[#FFFFFF] hover:text-red-900 bg-[#760C2A] hover:bg-transparent px-6 py-2 rounded-md text-sm transition-colors'
-                >
-                  Edit Post
-                </Link>
+                <div className='flex justify-between'>
+                  <Link
+                    href={`/ms-post/${post.id}`}
+                    className='inline-block border border-red-900 text-[#FFFFFF] hover:text-red-900 bg-[#760C2A] hover:bg-transparent px-6 py-2 rounded-md text-sm transition-colors'
+                  >
+                    Edit Post
+                  </Link>
+
+                  <button
+                    onClick={() => deleteMSPost(post.id)}
+                    className='inline-block border border-red-500 text-[#FFFFFF] hover:text-red-900 bg-[#fa2e68] hover:bg-transparent px-6 py-2 rounded-md text-sm transition-colors'
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             </div>
           ))}
