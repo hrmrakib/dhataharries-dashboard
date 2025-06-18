@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useLoginMutation } from "@/redux/feature/authAPI";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { saveTokens } from "@/service/authService";
 
 export default function Login() {
   const router = useRouter();
@@ -33,12 +34,13 @@ export default function Login() {
     try {
       const res = await login({ email, password }).unwrap();
       localStorage.setItem("accessToken", res?.access);
-      // In a real app, you would call your authentication API here
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      // alert("Login successful!");
-      toast.success(res?.message || "Login successful!");
 
-      router.push("/");
+      if (res?.access) {
+        await saveTokens(res?.access);
+        toast.success(res?.message || "Login successful!");
+        console.log("login res", res);
+        router.push("/");
+      }
     } catch (error: unknown) {
       console.error("Login failed:", error);
       const errorMessage =

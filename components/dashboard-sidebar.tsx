@@ -24,16 +24,17 @@ import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import LogoutModal from "./logout-modal";
 import { useState } from "react";
+import { logout } from "@/service/authService";
 
 export default function DashboardSidebar() {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
-  const handleLogout = () => {
+  const handleLogout = async() => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
-
+    await logout();
     setTimeout(() => {
       router.push("/signin");
     }, 1000);
@@ -56,7 +57,10 @@ export default function DashboardSidebar() {
       <div className='!bg-white md:!bg-transparent'>
         <Sidebar className='border-r border-gray-200 fixed left-0 h-full z-30 !bg-white md:!bg-transparent'>
           <SidebarContent>
-            <Link href='/' className='flex items-center justify-center gap-2 px-4 py-6'>
+            <Link
+              href='/'
+              className='flex items-center justify-center gap-2 px-4 py-6'
+            >
               <Image
                 src='/logo.png'
                 alt='logo'
