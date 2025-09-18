@@ -16,10 +16,9 @@ import { toast } from "sonner";
 export default function EditPost() {
   const router = useRouter();
   const [post, setPost] = useState({
-    title: "What Does The 2025 Spring Statement Mean For People MS?",
-    description:
-      "Key Proposals include Tightening Eligibility Criteria For Personal Independence Payment (PIP) From November 2026. Claimants Will Need To Score At Least Four Points On A Single Daily Living Activity To Qualify For The Daily Living Component, Potentially Reducing Support For Those With Fluctuating Conditions Like MS.",
-    image: "/post.jpg",
+    title: "",
+    description: "",
+    image: "",
   });
   const [isLoading, setIsLoading] = useState(false);
   const [image, setImage] = useState<File | null>(null);
@@ -37,7 +36,7 @@ export default function EditPost() {
       setPost({
         title: data?.title,
         description: data?.description,
-        image: data?.image || "/placeholder.svg",
+        image: data?.image,
       });
     }
   }, [data]);
@@ -153,7 +152,7 @@ export default function EditPost() {
                 />
               ) : (
                 <Image
-                  src={post?.image || "/post.jpg"}
+                  src={post?.image}
                   alt='Post image'
                   fill
                   className='object-cover rounded-md'

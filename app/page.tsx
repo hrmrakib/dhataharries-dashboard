@@ -187,78 +187,6 @@ function TransactionTable({ user_list }: any) {
             </TableBody>
           </Table>
         </div>
-
-        <div className='flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3'>
-          <div className='flex items-center gap-2'>
-            <Button
-              variant='outline'
-              size='sm'
-              className='h-8 w-8 p-0'
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              <span className='sr-only'>Previous</span>
-              <svg
-                className='h-4 w-4'
-                fill='none'
-                viewBox='0 0 24 24'
-                stroke='currentColor'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2}
-                  d='M15 19l-7-7 7-7'
-                />
-              </svg>
-            </Button>
-            <span className='text-sm'>Previous</span>
-          </div>
-
-          <div className='flex items-center gap-1'>
-            {Array.from({ length: totalPages }, (_, index) => index + 1).map(
-              (page) => (
-                <Button
-                  key={page}
-                  variant={page === currentPage ? "default" : "outline"}
-                  size='sm'
-                  className={`h-8 w-8 p-0 ${
-                    page === currentPage ? "bg-teal-800 text-white" : ""
-                  }`}
-                  onClick={() => handlePageChange(page)}
-                >
-                  {page}
-                </Button>
-              )
-            )}
-          </div>
-
-          <div className='flex items-center gap-2'>
-            <span className='text-sm'>Next</span>
-            <Button
-              variant='outline'
-              size='sm'
-              className='h-8 w-8 p-0'
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-            >
-              <span className='sr-only'>Next</span>
-              <svg
-                className='h-4 w-4'
-                fill='none'
-                viewBox='0 0 24 24'
-                stroke='currentColor'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2}
-                  d='M9 5l7 7-7 7'
-                />
-              </svg>
-            </Button>
-          </div>
-        </div>
       </div>
 
       {isModalOpen && (
@@ -279,7 +207,7 @@ function TransactionTable({ user_list }: any) {
               <h2 className='mb-6 text-center text-xl font-semibold text-gray-800'>
                 User Details
               </h2>
-              
+
               <div className='min-h-10'>
                 {isLoading ? (
                   <Loading />
