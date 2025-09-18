@@ -21,10 +21,21 @@ export default function Home() {
   const { data, isLoading } = useGetMSPostQuery(undefined);
   const [deleteMSPost] = useDeleteMSPostMutation({});
 
-  console.log(data);
   if (isLoading) {
     return <Loading />;
   }
+
+  const handleDelete = async (id: number) => {
+    if (!window.confirm("Are you sure you want to delete this post?")) {
+      return;
+    }
+
+    try {
+      await deleteMSPost(id).unwrap();
+    } catch (error) {
+      console.error("Error deleting post:", error);
+    }
+  };
 
   return (
     <main className='min-h-screen bg-pink-50 p-4 md:p-8'>
@@ -47,13 +58,13 @@ export default function Home() {
               key={post.id}
               className='bg-white rounded-lg overflow-hidden shadow-sm'
             >
-              <div className='relative h-48 w-full'>
+              <div className='relative max-h-48 w-full'>
                 <Image
                   src={post?.image}
                   alt={post.title}
                   width={600}
                   height={400}
-                  className='object-cover'
+                  className='object-cover h-48 w-full'
                 />
               </div>
               <div className='p-4 flex flex-col'>
@@ -72,7 +83,7 @@ export default function Home() {
                   </Link>
 
                   <button
-                    onClick={() => deleteMSPost(post.id)}
+                    onClick={() => handleDelete(post.id)}
                     className='inline-block border border-red-500 text-[#FFFFFF] hover:text-red-900 bg-[#fa2e68] hover:bg-transparent px-6 py-2 rounded-md text-sm transition-colors'
                   >
                     Delete
