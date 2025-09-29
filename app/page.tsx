@@ -166,7 +166,7 @@ function TransactionTable({ user_list }: any) {
                     {user?.email}
                   </TableCell>
                   <TableCell className='text-lg text-primary'>
-                    {user?.created_at.split("T")[0]}
+                    {user?.created_at?.split("T")[0]}
                   </TableCell>
                   <TableCell className='text-center text-lg text-primary'>
                     <Button
