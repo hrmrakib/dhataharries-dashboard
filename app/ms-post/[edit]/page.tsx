@@ -75,12 +75,11 @@ export default function EditPost() {
     formData.append("description", post.description);
 
     if (image) {
-      // Check file size
-      const maxSize = 5 * 1024 * 1024; // 5 MB in bytes
+      const maxSize = 5 * 1024 * 1024;
       if (image.size > maxSize) {
         toast.error("Image size should not exceed 5 MB");
         setIsLoading(false);
-        return; // Stop submission
+        return;
       }
 
       formData.append("image", image);
