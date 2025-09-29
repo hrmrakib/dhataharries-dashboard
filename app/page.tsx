@@ -25,6 +25,7 @@ interface IUser {
   full_name: string;
   email: string;
   profile_pic: string;
+  created_at: string;
 }
 
 export default function DashboardContent() {
@@ -165,12 +166,7 @@ function TransactionTable({ user_list }: any) {
                     {user?.email}
                   </TableCell>
                   <TableCell className='text-lg text-primary'>
-                    <Avatar>
-                      <AvatarImage
-                        src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${user?.profile_pic}`}
-                      />
-                      <AvatarFallback>{user?.full_name}</AvatarFallback>
-                    </Avatar>
+                    {user?.created_at.split("T")[0]}
                   </TableCell>
                   <TableCell className='text-center text-lg text-primary'>
                     <Button
