@@ -27,19 +27,19 @@ export default function EditPost() {
   const params = useParams();
 
   const [updateMSPost] = useUpdateMSPostMutation();
-  const { data, isLoading: isPostLoading } = useGetASingleMSPostQuery(
+  const { data: posts, isLoading: isPostLoading } = useGetASingleMSPostQuery(
     (params.edit as string) || ""
   );
 
   useEffect(() => {
-    if (data) {
+    if (posts?.data) {
       setPost({
-        title: data?.title,
-        description: data?.description,
-        image: data?.image,
+        title: posts?.data?.title,
+        description: posts?.data?.description,
+        image: posts?.data?.image,
       });
     }
-  }, [data]);
+  }, [posts?.data]);
 
   if (isPostLoading) {
     return <Loading />;

@@ -90,6 +90,8 @@ function TransactionTable({ user_list }: any) {
     skip: !userId,
   });
 
+  console.log(user_details);
+
   const openUserModal = (user: any) => {
     setSelectedUser(user);
     setIsModalOpen(true);

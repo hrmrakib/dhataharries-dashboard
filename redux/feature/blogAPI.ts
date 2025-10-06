@@ -9,6 +9,24 @@ const blogAPI = baseApi.injectEndpoints({
       }),
     }),
 
+    getBlogDataById: builder.query({
+      query: (id) => ({
+        url: `/blogs/v1/blogs/${id}/`,
+        providesTags: ["Blog"],
+      }),
+    }),
+
+    updatePost: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/blogs/v1/blogs/${id}/`,
+        method: "PATCH",
+        body: data,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }),
+    }),
+
     deleteBlog: builder.mutation({
       query: (id) => ({
         url: `/blogs/v1/blogs/${id}/`,
@@ -21,4 +39,9 @@ const blogAPI = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetBlogDataQuery, useDeleteBlogMutation } = blogAPI;
+export const {
+  useGetBlogDataQuery,
+  useGetBlogDataByIdQuery,
+  useUpdatePostMutation,
+  useDeleteBlogMutation,
+} = blogAPI;

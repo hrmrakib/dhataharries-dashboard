@@ -13,7 +13,6 @@ export const metadata: Metadata = {
   generator: "dev",
 };
 
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -22,13 +21,13 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body upword-verified='true'>
-        <Toaster position='top-center' />
+        <Toaster position='top-right' />
         <Providers>
           <SidebarProvider>
             <div className='flex min-h-screen bg-gray-50 w-full'>
               <DashboardSidebar />
               <div className='flex-1 w-full bg-[#FFF0F4]'>
-                <DashboardHeader  />
+                <DashboardHeader />
                 {children}
               </div>
             </div>

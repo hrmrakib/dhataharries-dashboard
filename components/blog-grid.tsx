@@ -16,6 +16,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
 import { MoreVertical } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface IBlog {
   id: number;
@@ -29,14 +30,18 @@ interface IBlog {
 
 export default function BlogGrid() {
   const [expanded, setExpanded] = useState(false);
-  const { data, isLoading, refetch } = useGetBlogDataQuery({});
+  const { data: stories, isLoading, refetch } = useGetBlogDataQuery({});
   const [deleteBlog] = useDeleteBlogMutation({});
+  const router = useRouter();
 
   if (isLoading) {
     return <Loading />;
   }
 
   const handleBlogDelete = async (id: number | string) => {
+    if (!window.confirm("Are you sure you want to delete this blog?")) {
+      return;
+    }
     const res = await deleteBlog(id);
     if (res.error) {
     } else {
@@ -44,10 +49,14 @@ export default function BlogGrid() {
     }
   };
 
+  const handleGoToEditPage = (id: number) => {
+    router.push(`/users-stories/edit/${id}`);
+  };
+
   return (
     <div className='w-full containe mx-auto'>
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4'>
-        {data.map((blog: IBlog) => (
+        {stories?.data?.map((blog: IBlog) => (
           <div className='bg-white rounded-lg p-6 relative'>
             <div className='flex justify-between items-start mb-4'>
               <div className='flex items-center'>
@@ -69,6 +78,9 @@ export default function BlogGrid() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align='end'>
+                  <DropdownMenuItem onClick={() => handleGoToEditPage(blog.id)}>
+                    Edit
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleBlogDelete(blog.id)}>
                     Delete
                   </DropdownMenuItem>

@@ -18,7 +18,7 @@ interface BlogPost {
 }
 
 export default function Home() {
-  const { data, isLoading } = useGetMSPostQuery(undefined);
+  const { data: posts, isLoading } = useGetMSPostQuery(undefined);
   const [deleteMSPost] = useDeleteMSPostMutation({});
 
   if (isLoading) {
@@ -53,7 +53,7 @@ export default function Home() {
 
         {/* Blog posts grid */}
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
-          {data?.map((post: BlogPost) => (
+          {posts?.data?.map((post: BlogPost) => (
             <div
               key={post.id}
               className='bg-white rounded-lg overflow-hidden shadow-sm'
