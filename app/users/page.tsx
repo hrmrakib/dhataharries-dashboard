@@ -17,13 +17,13 @@ import {
   useGetHomeDataQuery,
 } from "@/redux/feature/homeAPI";
 import Loading from "@/components/loading/Loading";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toPng } from "html-to-image";
 
 interface IUser {
   id: string;
   full_name: string;
   email: string;
+  date_joined: string;
   profile_pic: string;
 }
 
@@ -118,7 +118,6 @@ function TransactionTable({ user_list }: any) {
       });
   };
 
-
   return (
     <>
       <div className='overflow-hidden rounded-md'>
@@ -155,12 +154,7 @@ function TransactionTable({ user_list }: any) {
                     {user?.email}
                   </TableCell>
                   <TableCell className='text-lg text-primary'>
-                    <Avatar>
-                      <AvatarImage
-                        src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${user?.profile_pic}`}
-                      />
-                      <AvatarFallback>{user?.full_name}</AvatarFallback>
-                    </Avatar>
+                    {user?.date_joined?.split("T")[0]}
                   </TableCell>
                   <TableCell className='text-center text-lg text-primary'>
                     <Button
