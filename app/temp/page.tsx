@@ -1,6 +1,8 @@
 "use client";
 
+import { Info, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -10,43 +12,62 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useRef, useState } from "react";
-import UserDetailsModal from "@/components/user-details-modal";
-import Loading from "@/components/loading/Loading";
 import {
-  useGetDonationDataByIdQuery,
-  useGetDonationDataQuery,
-} from "@/redux/feature/donationAPI";
-import { Info, X } from "lucide-react";
+  useGetHomeDataByIdQuery,
+  useGetHomeDataQuery,
+} from "@/redux/feature/homeAPI";
+import Loading from "@/components/loading/Loading";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toPng } from "html-to-image";
 
 interface IUser {
+  id: string;
   full_name: string;
   email: string;
-  amount: string;
-  location: string;
-  payment_status: string;
-  created_at: string;
+  profile_pic: string;
+  date_joined: string;
 }
 
 export default function DashboardContent() {
-  const { data: donation_list } = useGetDonationDataQuery({});
+  const { data, isLoading } = useGetHomeDataQuery({});
 
-  console.log(donation_list?.data);
-
-  if (!donation_list?.data) {
-    return (
-      <div>
-        <Loading />
-      </div>
-    );
+  if (isLoading) {
+    return <Loading />;
   }
 
   return (
     <main className='w-full p-4 md:p-6'>
+      <section className='mb-8'>
+        <h2 className='mb-4 text-[32px] font-medium text-primary'>Overview</h2>
+        <div className='md:container mx-auto'>
+          <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+            <StatCard title='Total Earnings' value={data?.total_donations} />
+            <StatCard title='Total User' value={data?.all_user_list} />
+            <StatCard title='Total Stories' value={data?.total_stories} />
+          </div>
+        </div>
+      </section>
+
       <section>
-        <TransactionTable donation_list={donation_list?.data} />
+        <TransactionTable user_list={data?.user_list} />
       </section>
     </main>
+  );
+}
+
+interface StatCardProps {
+  title: string;
+  value: string;
+}
+
+function StatCard({ title, value }: StatCardProps) {
+  return (
+    <Card className='overflow-hidden w-full md:max-w-[380px] h-[161px] flex items-center justify-center border border-gray-200'>
+      <CardContent className='flex flex-col items-center justify-center p-6'>
+        <h3 className='mb-2 text-[#6E7A8A]'>{title}</h3>
+        <p className='text-[32px] font-semibold text-primary'>{value}</p>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -64,28 +85,28 @@ function DetailRow({ label, value }: DetailRowProps) {
   );
 }
 
-function TransactionTable({ donation_list }: any) {
+function TransactionTable({ user_list }: any) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10); // show 10 items per page
+  const [itemsPerPage] = useState(10);
+  const [userId, setUserId] = useState<string | null>(null);
+  const cardRef = useRef(null);
 
-  // --- PAGINATION LOGIC ---
-  const totalPages = Math.ceil(donation_list.length / itemsPerPage);
+  // ✅ PAGINATION CALCULATION
+  const totalPages = Math.ceil(user_list?.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentDonations = donation_list.slice(startIndex, endIndex);
-  // ------------------------
+  const currentUsers = user_list?.slice(startIndex, endIndex);
 
-  const cardRef = useRef(null);
-  const [id, setId] = useState(null);
-
-  const { data: donation, isLoading } = useGetDonationDataByIdQuery(id);
+  const { data: user_details, isLoading } = useGetHomeDataByIdQuery(userId, {
+    skip: !userId,
+  });
 
   const openUserModal = (user: any) => {
     setSelectedUser(user);
     setIsModalOpen(true);
-    setId(user.donation_id);
+    setUserId(user?.id);
   };
 
   const handlePageChange = (page: number) => {
@@ -114,8 +135,8 @@ function TransactionTable({ donation_list }: any) {
       <div className='overflow-hidden rounded-md'>
         <div className='mb-8'>
           <div className='flex items-center justify-between mb-6'>
-            <h2 className='text-[28px] font-medium text-primary underline'>
-              All Donation List
+            <h2 className='text-[28px] font-medium text-primary'>
+              Recent Users
             </h2>
           </div>
         </div>
@@ -124,28 +145,34 @@ function TransactionTable({ donation_list }: any) {
           <Table>
             <TableHeader className='bg-[#760C2A] hover:!bg-[#760C2A] text-white'>
               <TableRow>
-                <TableHead className='text-white'>Username</TableHead>
+                <TableHead className='text-white'>#Tr.ID</TableHead>
+                <TableHead className='text-white'>User Name</TableHead>
                 <TableHead className='text-white'>Email</TableHead>
-                <TableHead className='text-white'>Amount</TableHead>
-                <TableHead className='text-white'>Location</TableHead>
-                <TableHead className='text-center text-white'>Detail</TableHead>
+                <TableHead className='text-white'>Join Date</TableHead>
+                <TableHead className='text-center text-white'>Action</TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
-              {currentDonations.map((user: IUser) => (
-                <TableRow key={user?.created_at} className='hover:bg-gray-100'>
+              {currentUsers?.map((user: IUser) => (
+                <TableRow key={user?.id}>
                   <TableCell className='font-medium text-lg text-primary'>
+                    {user?.id}
+                  </TableCell>
+                  <TableCell className='flex items-center gap-2 text-lg text-primary'>
+                    <Avatar className='h-8 w-8'>
+                      <AvatarImage src={user?.profile_pic} alt={user?.full_name} />
+                      <AvatarFallback>
+                        {user?.full_name?.charAt(0)?.toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
                     {user?.full_name}
                   </TableCell>
                   <TableCell className='text-lg text-primary'>
                     {user?.email}
                   </TableCell>
                   <TableCell className='text-lg text-primary'>
-                    {user?.amount}
-                  </TableCell>
-                  <TableCell className='text-lg text-primary'>
-                    {user?.location}
+                    {user?.date_joined?.split("T")[0]}
                   </TableCell>
                   <TableCell className='text-center text-lg text-primary'>
                     <Button
@@ -163,7 +190,7 @@ function TransactionTable({ donation_list }: any) {
           </Table>
         </div>
 
-        {/* Pagination Controls */}
+        {/* ✅ PAGINATION CONTROLS */}
         <div className='flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 mt-4'>
           <div className='flex items-center gap-2'>
             <Button
@@ -235,7 +262,7 @@ function TransactionTable({ donation_list }: any) {
         </div>
       </div>
 
-      {/* Modal Section */}
+      {/* ✅ USER MODAL */}
       {isModalOpen && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
           <div
@@ -250,7 +277,7 @@ function TransactionTable({ donation_list }: any) {
             </button>
 
             <h2 className='mb-6 text-center text-xl font-semibold text-gray-800'>
-              Donation Details
+              User Details
             </h2>
 
             <div className='min-h-10'>
@@ -258,25 +285,37 @@ function TransactionTable({ donation_list }: any) {
                 <Loading />
               ) : (
                 <div className='space-y-4'>
+                  <DetailRow label='User ID:' value={user_details?.id} />
                   <DetailRow
-                    label='Donation ID:'
-                    value={selectedUser?.donation_id}
+                    label='Date'
+                    value={user_details?.date_joined?.split("T")[0]}
                   />
                   <DetailRow
-                    label='Donator Name'
-                    value={selectedUser?.full_name}
+                    label='User Name'
+                    value={user_details?.full_name}
                   />
-                  <DetailRow label='Email' value={selectedUser?.email} />
-                  <DetailRow label='Location' value={selectedUser?.location} />
-                  <DetailRow label='Amount' value={selectedUser?.amount} />
-                  <DetailRow
-                    label='Status'
-                    value={selectedUser?.payment_status}
-                  />
-                  <DetailRow
-                    label='Verified'
-                    value={selectedUser?.is_verified ? "Yes ✅" : "No ❌"}
-                  />
+
+                  {user_details?.occupation && (
+                    <DetailRow
+                      label='Occupation'
+                      value={user_details?.occupation}
+                    />
+                  )}
+                  {user_details?.mobile_no && (
+                    <DetailRow label='Mobile' value={user_details?.mobile_no} />
+                  )}
+                  {user_details?.location && (
+                    <DetailRow
+                      label='Location'
+                      value={user_details?.location}
+                    />
+                  )}
+                  {user_details?.is_verified && (
+                    <DetailRow
+                      label='Verified'
+                      value={user_details?.is_verified ? "Yes ✅" : "No ❌"}
+                    />
+                  )}
                 </div>
               )}
             </div>

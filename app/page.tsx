@@ -91,12 +91,13 @@ function TransactionTable({ user_list }: any) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [userId, setUserId] = useState<string | null>(null);
+  const cardRef = useRef(null);
 
-  // Calculate pagination
+  // ✅ PAGINATION CALCULATION
   const totalPages = Math.ceil(user_list?.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const cardRef = useRef(null);
+  const currentUsers = user_list?.slice(startIndex, endIndex);
 
   const { data: user_details, isLoading } = useGetHomeDataByIdQuery(userId, {
     skip: !userId,
@@ -105,7 +106,6 @@ function TransactionTable({ user_list }: any) {
   const openUserModal = (user: any) => {
     setSelectedUser(user);
     setIsModalOpen(true);
-
     setUserId(user?.id);
   };
 
@@ -154,12 +154,21 @@ function TransactionTable({ user_list }: any) {
             </TableHeader>
 
             <TableBody>
-              {user_list?.map((user: IUser) => (
+              {currentUsers?.map((user: IUser) => (
                 <TableRow key={user?.id}>
                   <TableCell className='font-medium text-lg text-primary'>
                     {user?.id}
                   </TableCell>
-                  <TableCell className='text-lg text-primary'>
+                  <TableCell className='flex items-center gap-2 text-lg text-primary'>
+                    <Avatar className='h-8 w-8'>
+                      <AvatarImage
+                        src={user?.profile_pic}
+                        alt={user?.full_name}
+                      />
+                      <AvatarFallback>
+                        {user?.full_name?.charAt(0)?.toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
                     {user?.full_name}
                   </TableCell>
                   <TableCell className='text-lg text-primary'>
@@ -183,80 +192,142 @@ function TransactionTable({ user_list }: any) {
             </TableBody>
           </Table>
         </div>
+
+        {/* ✅ PAGINATION CONTROLS */}
+        <div className='flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 mt-4'>
+          <div className='flex items-center gap-2'>
+            <Button
+              variant='outline'
+              size='sm'
+              className='h-8 w-8 p-0'
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              <svg
+                className='h-4 w-4'
+                fill='none'
+                viewBox='0 0 24 24'
+                stroke='currentColor'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M15 19l-7-7 7-7'
+                />
+              </svg>
+            </Button>
+            <span className='text-sm'>Prev</span>
+          </div>
+
+          <div className='flex items-center gap-1'>
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+              (page) => (
+                <Button
+                  key={page}
+                  variant={page === currentPage ? "default" : "outline"}
+                  size='sm'
+                  className={`h-8 w-8 p-0 ${
+                    page === currentPage ? "bg-teal-800 text-white" : ""
+                  }`}
+                  onClick={() => handlePageChange(page)}
+                >
+                  {page}
+                </Button>
+              )
+            )}
+          </div>
+
+          <div className='flex items-center gap-2'>
+            <span className='text-sm'>Next</span>
+            <Button
+              variant='outline'
+              size='sm'
+              className='h-8 w-8 p-0'
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              <svg
+                className='h-4 w-4'
+                fill='none'
+                viewBox='0 0 24 24'
+                stroke='currentColor'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M9 5l7 7-7 7'
+                />
+              </svg>
+            </Button>
+          </div>
+        </div>
       </div>
 
+      {/* ✅ USER MODAL */}
       {isModalOpen && (
-        <div>
-          <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
-            <div
-              ref={cardRef}
-              className='relative w-full max-w-md rounded-md bg-white p-6 shadow-lg'
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+          <div
+            ref={cardRef}
+            className='relative w-full max-w-md rounded-md bg-white p-6 shadow-lg'
+          >
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className='absolute right-4 top-4 text-gray-500 hover:text-gray-700'
             >
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className='absolute right-4 top-4 text-gray-500 hover:text-gray-700'
-              >
-                <X className='h-5 w-5' />
-                <span className='sr-only'>Close</span>
-              </button>
+              <X className='h-5 w-5' />
+            </button>
 
-              <h2 className='mb-6 text-center text-xl font-semibold text-gray-800'>
-                User Details
-              </h2>
+            <h2 className='mb-6 text-center text-xl font-semibold text-gray-800'>
+              User Details
+            </h2>
 
-              <div className='min-h-10'>
-                {isLoading ? (
-                  <Loading />
-                ) : (
-                  <div className='space-y-4'>
-                    <DetailRow label='User ID:' value={user_details?.id} />
+            <div className='min-h-10'>
+              {isLoading ? (
+                <Loading />
+              ) : (
+                <div className='space-y-4'>
+                  <DetailRow label='User ID:' value={user_details?.id} />
+                  <DetailRow
+                    label='Date'
+                    value={user_details?.date_joined?.split("T")[0]}
+                  />
+                  <DetailRow
+                    label='User Name'
+                    value={user_details?.full_name}
+                  />
 
+                  {user_details?.occupation && (
                     <DetailRow
-                      label='Date'
-                      value={user_details?.date_joined?.split("T")[0]}
+                      label='Occupation'
+                      value={user_details?.occupation}
                     />
-
+                  )}
+                  {user_details?.mobile_no && (
+                    <DetailRow label='Mobile' value={user_details?.mobile_no} />
+                  )}
+                  {user_details?.location && (
                     <DetailRow
-                      label='User Name'
-                      value={user_details?.full_name}
+                      label='Location'
+                      value={user_details?.location}
                     />
-
-                    {user_details?.occupation && (
-                      <DetailRow
-                        label='Occupation'
-                        value={user_details?.occupation}
-                      />
-                    )}
-
-                    {user_details?.mobile_no && (
-                      <DetailRow
-                        label='Mobile'
-                        value={user_details?.mobile_no}
-                      />
-                    )}
-
-                    {user_details?.location && (
-                      <DetailRow
-                        label='Location'
-                        value={user_details?.location}
-                      />
-                    )}
-                    {user_details?.is_verified && (
-                      <DetailRow
-                        label='Varified'
-                        value={user_details?.is_verified ? "Yes ✅" : "No ❌"}
-                      />
-                    )}
-                  </div>
-                )}
-              </div>
-              <Button
-                onClick={downloadAsImage}
-                className='mt-6 w-full bg-teal-800 hover:bg-teal-700'
-              >
-                Download
-              </Button>
+                  )}
+                  {user_details?.is_verified && (
+                    <DetailRow
+                      label='Verified'
+                      value={user_details?.is_verified ? "Yes ✅" : "No ❌"}
+                    />
+                  )}
+                </div>
+              )}
             </div>
+            <Button
+              onClick={downloadAsImage}
+              className='mt-6 w-full bg-teal-800 hover:bg-teal-700'
+            >
+              Download
+            </Button>
           </div>
         </div>
       )}

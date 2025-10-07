@@ -27,7 +27,7 @@ interface IUser {
   profile_pic: string;
 }
 
-export default function DashboardContent() {
+export default function UserPage() {
   const { data, isLoading } = useGetHomeDataQuery({});
 
   if (isLoading) {
@@ -79,23 +79,22 @@ function TransactionTable({ user_list }: any) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [userId, setUserId] = useState<string | null>(null);
+  const cardRef = useRef(null);
 
-  // Calculate pagination
+  // --- PAGINATION LOGIC ---
   const totalPages = Math.ceil(user_list?.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const cardRef = useRef(null);
+  const currentUsers = user_list?.slice(startIndex, endIndex);
+  // -------------------------
 
   const { data: user_details, isLoading } = useGetHomeDataByIdQuery(userId, {
     skip: !userId,
   });
 
-  console.log(user_details);
-
   const openUserModal = (user: any) => {
     setSelectedUser(user);
     setIsModalOpen(true);
-
     setUserId(user?.id);
   };
 
@@ -144,7 +143,7 @@ function TransactionTable({ user_list }: any) {
             </TableHeader>
 
             <TableBody>
-              {user_list?.map((user: IUser) => (
+              {currentUsers?.map((user: IUser) => (
                 <TableRow key={user?.id}>
                   <TableCell className='font-medium text-lg text-primary'>
                     {user?.id}
@@ -174,7 +173,8 @@ function TransactionTable({ user_list }: any) {
           </Table>
         </div>
 
-        <div className='flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3'>
+        {/* Pagination Controls */}
+        <div className='flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 mt-4'>
           <div className='flex items-center gap-2'>
             <Button
               variant='outline'
@@ -183,7 +183,6 @@ function TransactionTable({ user_list }: any) {
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
             >
-              <span className='sr-only'>Previous</span>
               <svg
                 className='h-4 w-4'
                 fill='none'
@@ -198,7 +197,7 @@ function TransactionTable({ user_list }: any) {
                 />
               </svg>
             </Button>
-            <span className='text-sm'>Previous</span>
+            <span className='text-sm'>Prev</span>
           </div>
 
           <div className='flex items-center gap-1'>
@@ -228,7 +227,6 @@ function TransactionTable({ user_list }: any) {
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
             >
-              <span className='sr-only'>Next</span>
               <svg
                 className='h-4 w-4'
                 fill='none'
@@ -247,72 +245,68 @@ function TransactionTable({ user_list }: any) {
         </div>
       </div>
 
+      {/* Modal Section */}
       {isModalOpen && (
-        <div>
-          <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
-            <div
-              ref={cardRef}
-              className='relative w-full max-w-md rounded-md bg-white p-6 shadow-lg'
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+          <div
+            ref={cardRef}
+            className='relative w-full max-w-md rounded-md bg-white p-6 shadow-lg'
+          >
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className='absolute right-4 top-4 text-gray-500 hover:text-gray-700'
             >
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className='absolute right-4 top-4 text-gray-500 hover:text-gray-700'
-              >
-                <X className='h-5 w-5' />
-                <span className='sr-only'>Close</span>
-              </button>
+              <X className='h-5 w-5' />
+            </button>
 
-              <h2 className='mb-6 text-center text-xl font-semibold text-gray-800'>
-                User Details
-              </h2>
-              <div className='min-h-10'>
-                {isLoading ? (
-                  <Loading />
-                ) : (
-                  <div className='space-y-4'>
-                    <DetailRow label='User ID:' value={user_details?.id} />
-                    <DetailRow
-                      label='Date'
-                      value={user_details?.date_joined?.split("T")[0]}
-                    />
-                    <DetailRow
-                      label='User Name'
-                      value={user_details?.full_name}
-                    />
-                    <DetailRow
-                      label='Occupation'
-                      value={user_details?.occupation}
-                    />
+            <h2 className='mb-6 text-center text-xl font-semibold text-gray-800'>
+              User Details
+            </h2>
 
-                    {user_details?.mobile_no && (
-                      <DetailRow
-                        label='Mobile'
-                        value={user_details?.mobile_no}
-                      />
-                    )}
+            <div className='min-h-10'>
+              {isLoading ? (
+                <Loading />
+              ) : (
+                <div className='space-y-4'>
+                  <DetailRow label='User ID:' value={user_details?.id} />
+                  <DetailRow
+                    label='Date'
+                    value={user_details?.date_joined?.split("T")[0]}
+                  />
+                  <DetailRow
+                    label='User Name'
+                    value={user_details?.full_name}
+                  />
+                  <DetailRow
+                    label='Occupation'
+                    value={user_details?.occupation}
+                  />
 
-                    {user_details?.location && (
-                      <DetailRow
-                        label='Location'
-                        value={user_details?.location}
-                      />
-                    )}
-                    {user_details?.is_verified && (
-                      <DetailRow
-                        label='Varified'
-                        value={user_details?.is_verified ? "Yes ✅" : "No ❌"}
-                      />
-                    )}
-                  </div>
-                )}
-              </div>
-              <Button
-                onClick={downloadAsImage}
-                className='mt-6 w-full bg-teal-800 hover:bg-teal-700'
-              >
-                Download
-              </Button>
+                  {user_details?.mobile_no && (
+                    <DetailRow label='Mobile' value={user_details?.mobile_no} />
+                  )}
+
+                  {user_details?.location && (
+                    <DetailRow
+                      label='Location'
+                      value={user_details?.location}
+                    />
+                  )}
+                  {user_details?.is_verified && (
+                    <DetailRow
+                      label='Verified'
+                      value={user_details?.is_verified ? "Yes ✅" : "No ❌"}
+                    />
+                  )}
+                </div>
+              )}
             </div>
+            <Button
+              onClick={downloadAsImage}
+              className='mt-6 w-full bg-teal-800 hover:bg-teal-700'
+            >
+              Download
+            </Button>
           </div>
         </div>
       )}
