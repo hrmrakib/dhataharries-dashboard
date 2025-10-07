@@ -3,26 +3,19 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Edit } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import DashboardSidebar from "@/components/dashboard-sidebar";
-import DashboardHeader from "@/components/dashboard-header";
 import { useGetProfileQuery } from "@/redux/feature/settingAPI";
 import Loading from "@/components/loading/Loading";
 
 export default function PersonalInformationPage() {
-  const userData = {
-    name: "Sharon",
-    email: "alkhahiaksk@hmail.com",
-    phone: "+88017999855325",
-    profileImage: "/admin.jpg",
-  };
+  const { data: profile, isLoading } = useGetProfileQuery({});
 
-  const { data, isLoading } = useGetProfileQuery({});
+  console.log(profile);
 
   if (isLoading) {
     return <Loading />;
   }
+
+  const apiUrl = "https://api.enitiative.org";
 
   return (
     <div className='flex min-h-screen bg-[#FFFFFF]'>
@@ -56,10 +49,7 @@ export default function PersonalInformationPage() {
                 <div className='w-full md:w-64 flex flex-col items-center border border-gray-600 rounded-md px-6 py-10'>
                   <div className='w-32 h-32 rounded-full overflow-hidden relative mb-3'>
                     <Image
-                      src={
-                        `${process.env.NEXT_PUBLIC_IMAGE_URL}${data?.profile_pic}` ||
-                        "/admin.jpg"
-                      }
+                      src={`${apiUrl}${profile?.data?.profile_pic}`}
                       alt='Profile'
                       fill
                       className='object-cover'
@@ -76,7 +66,7 @@ export default function PersonalInformationPage() {
                   <div className='flex flex-col gap-1'>
                     <div className='text-lg font-medium text-primary'>Name</div>
                     <div className='text-lg text-primary px-2 py-3 rounded-md border border-gray-500'>
-                      {data?.full_name}
+                      {profile?.data?.full_name}
                     </div>
                   </div>
 
@@ -85,7 +75,7 @@ export default function PersonalInformationPage() {
                       Email
                     </div>
                     <div className='text-lg text-primary px-2 py-3 rounded-md border border-gray-500'>
-                      {data?.email}
+                      {profile?.data?.email}
                     </div>
                   </div>
 
@@ -94,7 +84,7 @@ export default function PersonalInformationPage() {
                       Phone Number
                     </div>
                     <div className='text-lg text-primary px-2 py-3 rounded-md border border-gray-500'>
-                      {data?.mobile_no}
+                      {profile?.data?.mobile_no}
                     </div>
                   </div>
                 </div>
