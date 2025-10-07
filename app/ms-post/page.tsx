@@ -52,13 +52,15 @@ export default function Home() {
         </div>
 
         {/* Blog posts grid */}
+
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
           {posts?.data?.map((post: BlogPost) => (
             <div
               key={post.id}
-              className='bg-white rounded-lg overflow-hidden shadow-sm'
+              className='flex flex-col bg-white rounded-lg overflow-hidden shadow-sm h-full'
             >
-              <div className='relative max-h-48 w-full'>
+              {/* Image Section */}
+              <div className='relative h-48 w-full'>
                 <Image
                   src={post?.image}
                   alt={post.title}
@@ -67,24 +69,30 @@ export default function Home() {
                   className='object-cover h-48 w-full'
                 />
               </div>
-              <div className='p-4 flex flex-col'>
-                <h2 className='text-2xl text-[#2C383C] font-semibold mb-2 hover:underline'>
-                  <Link href={`/posts/${post.id}`}>{post?.title}</Link>
-                </h2>
-                <p className='text-sm text-[#727A7C] mb-4 line-clamp-4 flex-1'>
-                  {post?.description}
-                </p>
-                <div className='flex justify-between'>
+
+              {/* Text + Buttons Section */}
+              <div className='flex flex-col flex-grow justify-between p-4'>
+                <div>
+                  <h2 className='text-xl text-[#2C383C] font-semibold mb-2 hover:underline'>
+                    <Link href={`/posts/${post.id}`}>{post?.title}</Link>
+                  </h2>
+                  <p className='text-sm text-[#727A7C] mb-4 line-clamp-4'>
+                    {post?.description}
+                  </p>
+                </div>
+
+                {/* Buttons */}
+                <div className='flex justify-between mt-auto'>
                   <Link
                     href={`/ms-post/${post.id}`}
-                    className='inline-block border border-red-900 text-[#FFFFFF] hover:text-red-900 bg-[#760C2A] hover:bg-transparent px-6 py-2 rounded-md text-sm transition-colors'
+                    className='border border-red-900 text-white hover:text-red-900 bg-[#760C2A] hover:bg-transparent px-5 py-2 rounded-md text-sm transition-all duration-200'
                   >
                     Edit Post
                   </Link>
 
                   <button
                     onClick={() => handleDelete(post.id)}
-                    className='inline-block border border-red-500 text-[#FFFFFF] hover:text-red-900 bg-[#fa2e68] hover:bg-transparent px-6 py-2 rounded-md text-sm transition-colors'
+                    className='border border-red-500 text-white hover:text-red-900 bg-[#fa2e68] hover:bg-transparent px-5 py-2 rounded-md text-sm transition-all duration-200'
                   >
                     Delete
                   </button>
