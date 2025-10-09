@@ -13,6 +13,17 @@ const uploadSeriesAPI = baseApi.injectEndpoints({
       }),
     }),
 
+    getUploadSeriesById: builder.query({
+      query: (id) => ({
+        url: `/blogs/v1/ms-videos/${id}/`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        providesTags: ["UploadSeries"],
+      }),
+    }),
+
     createPost: builder.mutation({
       query: (data) => ({
         url: "/blogs/v1/ms-videos/",
@@ -23,9 +34,24 @@ const uploadSeriesAPI = baseApi.injectEndpoints({
         },
       }),
     }),
+
+    updatePost: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/blogs/v1/ms-videos/${id}/`,
+        method: "PATCH",
+        body: data,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }),
+    }),
   }),
 });
 
-export const { useGetUploadSeriesQuery, useCreatePostMutation } =
-  uploadSeriesAPI;
+export const {
+  useGetUploadSeriesQuery,
+  useGetUploadSeriesByIdQuery,
+  useCreatePostMutation,
+  useUpdatePostMutation,
+} = uploadSeriesAPI;
 export default uploadSeriesAPI;

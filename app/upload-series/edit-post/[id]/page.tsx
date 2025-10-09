@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,30 +10,54 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import {
+  useCreatePostMutation,
+  useGetUploadSeriesByIdQuery,
+} from "@/redux/feature/uploadSeriesAPI";
+import { useUpdatePostMutation } from "@/redux/feature/blogAPI";
 
 interface FormData {
+  author_name: string;
   title: string;
   description: string;
   youtube_link: string;
 }
 
 interface FormErrors {
+  author_name?: string;
   title?: string;
   description?: string;
   youtube_link?: string;
 }
 
-export default function CreatePostForm() {
+export default function UpdatePostForm() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<FormData>({
+    author_name: "",
     title: "",
     description: "",
     youtube_link: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const router = useRouter();
+  const params = useParams();
+  const { data: post } = useGetUploadSeriesByIdQuery(params.id as string);
+  const [updatePost] = useUpdatePostMutation();
+
+  useEffect(() => {
+    if (post?.data) {
+      setFormData({
+        author_name: post.data.author_name,
+        title: post.data.title,
+        description: post.data.description,
+        youtube_link: post.data.video_url,
+      });
+    }
+  }, [post]);
+
+  console.log(post?.data);
 
   const validateYouTubeUrl = (url: string): boolean => {
     if (!url) return true; // Optional field
@@ -78,24 +102,30 @@ export default function CreatePostForm() {
 
     setIsSubmitting(true);
 
-    // Simulate API call
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const data = {
+        title: formData.title,
+        author_name: formData.author_name,
+        video_url: formData.youtube_link,
+        description: formData.description,
+      };
+      const res = await updatePost({ id: params.id as string, data }).unwrap();
 
-      console.log("[v0] Form submitted:", formData);
+      if (res?.success) {
+        toast({
+          title: "✅ Success!",
+          description: "Your post has been created successfully.",
+        });
 
-      toast({
-        title: "Success!",
-        description: "Your post has been created successfully.",
-      });
-
-      // Reset form
-      setFormData({
-        title: "",
-        description: "",
-        youtube_link: "",
-      });
-      setErrors({});
+        // Reset form
+        setFormData({
+          author_name: "",
+          title: "",
+          description: "",
+          youtube_link: "",
+        });
+        setErrors({});
+      }
     } catch (error) {
       toast({
         title: "Error",
@@ -130,6 +160,7 @@ export default function CreatePostForm() {
           </button>
           <h2 className='text-2xl font-semibold'>Create Post</h2>
         </div>
+
         <div className='space-y-2'>
           <Label htmlFor='title' className='text-lg font-medium'>
             Title <span className='text-destructive'>*</span>
@@ -184,7 +215,6 @@ export default function CreatePostForm() {
         <div className='space-y-2'>
           <Label htmlFor='youtube_link' className='text-lg font-medium'>
             YouTube Link{" "}
-            {/* <span className='text-muted-foreground'>(Optional)</span> */}
           </Label>
           <Input
             id='youtube_link'
@@ -206,19 +236,46 @@ export default function CreatePostForm() {
           )}
         </div>
 
+        <div className='space-y-2 w-full'>
+          <Label htmlFor='title' className='text-lg font-medium'>
+            Author <span className='text-destructive'>*</span>
+          </Label>
+          <Input
+            id='title'
+            name='author_name'
+            type='text'
+            placeholder='Enter your name'
+            value={formData.author_name}
+            onChange={handleChange}
+            className={`h-11 ${errors.author_name ? "border-destructive" : ""}`}
+            aria-invalid={!!errors.author_name}
+            aria-describedby={errors.author_name ? "title-error" : undefined}
+          />
+          {errors.author_name && (
+            <p id='title-error' className='text-sm text-destructive'>
+              {errors.author_name}
+            </p>
+          )}
+        </div>
+
         <div className='flex flex-col gap-3 pt-2 sm:flex-row sm:gap-4'>
           <Button
             type='submit'
             disabled={isSubmitting}
             className='h-11 flex-1 sm:flex-none sm:px-8'
           >
-            {isSubmitting ? "Publishing..." : "Publish Post"}
+            {isSubmitting ? "Updating..." : "Update Post"}
           </Button>
           <Button
             type='button'
             variant='outline'
             onClick={() => {
-              setFormData({ title: "", description: "", youtube_link: "" });
+              setFormData({
+                author_name: "",
+                title: "",
+                description: "",
+                youtube_link: "",
+              });
               setErrors({});
             }}
             disabled={isSubmitting}

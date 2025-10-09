@@ -145,7 +145,7 @@ export default function PostsPage() {
   console.log(series?.data, "upload series data");
 
   const handleEdit = (id: string | number) => {
-    router.push(`/upload-series/create-post?edit=${id}`);
+    router.push(`/upload-series/edit-post/${id}`);
   };
 
   const handleDeleteConfirm = () => {
