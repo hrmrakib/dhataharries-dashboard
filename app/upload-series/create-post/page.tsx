@@ -92,21 +92,22 @@ export default function CreatePostForm() {
         description: formData.description,
       }).unwrap();
 
-      console.log("submitted:", res);
+      if (res?.success) {
+        toast({
+          title: "✅ Success!",
+          description: "Your post has been created successfully.",
+        });
 
-      toast({
-        title: "✅ Success!",
-        description: "Your post has been created successfully.",
-      });
-
-      // Reset form
-      setFormData({
-        author_name: "",
-        title: "",
-        description: "",
-        youtube_link: "",
-      });
-      setErrors({});
+        router.push("/upload-series");
+        // Reset form
+        setFormData({
+          author_name: "",
+          title: "",
+          description: "",
+          youtube_link: "",
+        });
+        setErrors({});
+      }
     } catch (error) {
       toast({
         title: "Error",
