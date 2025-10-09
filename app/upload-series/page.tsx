@@ -52,6 +52,7 @@ function PostCard({
   onEdit: (id: string | number) => void;
   onDelete: (id: string | number) => void;
 }) {
+  const [showMore, setShowMore] = useState(false);
   const getYouTubeEmbedUrl = (url: string): string | null => {
     if (!url) return null;
     const videoIdMatch = url.match(
@@ -64,7 +65,7 @@ function PostCard({
 
   const embedUrl = getYouTubeEmbedUrl(post.video_url ?? "");
 
-  console.log("post card", post);
+  const toggleShowMore = () => setShowMore((prev) => !prev);
 
   return (
     <Card className='flex h-full flex-col overflow-hidden transition-shadow hover:shadow-lg'>
@@ -83,7 +84,16 @@ function PostCard({
 
       <CardContent className='flex-1 space-y-4 pb-4'>
         <p className='text-pretty text-sm leading-relaxed text-foreground/90 sm:text-base'>
-          {post.description}
+          {showMore ? post.description : post.description.substring(0, 30)}
+
+          {post.description.length > 30 && (
+            <button
+              onClick={toggleShowMore}
+              className='ml-1 text-blue-500 hover:underline'
+            >
+              {showMore ? "Show less" : "Show more"}
+            </button>
+          )}
         </p>
 
         {embedUrl && (
@@ -142,7 +152,7 @@ export default function PostsPage() {
   const postsPerPage = 3;
 
   const router = useRouter();
-  const { data: series } = useGetUploadSeriesQuery(undefined, {
+  const { data: series, refetch } = useGetUploadSeriesQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
   const [deletePost] = useDeletePostMutation();
@@ -155,6 +165,7 @@ export default function PostsPage() {
     if (deletePostId) {
       const res = await deletePost(deletePostId);
       if (res?.data?.success) {
+        refetch();
         toast("✅ Post deleted successfully!");
         // setDeletePostId(undefined);
       }
