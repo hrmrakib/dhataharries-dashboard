@@ -31,7 +31,7 @@ export default function DashboardSidebar() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const handleLogout = async() => {
+  const handleLogout = async () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     await logout();
@@ -77,6 +77,7 @@ export default function DashboardSidebar() {
                 label='Dashboard'
                 active={pathname === "/"}
               />
+
               <NavItem
                 href='/users-stories'
                 icon={BookType}
@@ -86,12 +87,23 @@ export default function DashboardSidebar() {
                   pathname.startsWith("/users-stories")
                 }
               />
+
               <NavItem
                 href='/ms-post'
                 icon={NotebookPen}
                 label='MS Post'
                 active={
                   pathname === "/ms-post" || pathname.startsWith("/ms-post")
+                }
+              />
+
+              <NavItem
+                href='/upload-series'
+                icon={NotebookPen}
+                label='Upload Series'
+                active={
+                  pathname === "/upload-series" ||
+                  pathname.startsWith("/upload-series")
                 }
               />
 
