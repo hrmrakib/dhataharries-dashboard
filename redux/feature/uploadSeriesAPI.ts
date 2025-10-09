@@ -45,6 +45,16 @@ const uploadSeriesAPI = baseApi.injectEndpoints({
         },
       }),
     }),
+
+    deletePost: builder.mutation({
+      query: (id) => ({
+        url: `/blogs/v1/ms-videos/${id}/`,
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }),
+    }),
   }),
 });
 
@@ -53,5 +63,6 @@ export const {
   useGetUploadSeriesByIdQuery,
   useCreatePostMutation,
   useUpdatePostMutation,
+  useDeletePostMutation,
 } = uploadSeriesAPI;
 export default uploadSeriesAPI;

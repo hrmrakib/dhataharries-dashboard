@@ -24,7 +24,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useGetUploadSeriesQuery } from "@/redux/feature/uploadSeriesAPI";
+import {
+  useDeletePostMutation,
+  useGetUploadSeriesQuery,
+} from "@/redux/feature/uploadSeriesAPI";
+import { toast } from "sonner";
 
 // ✅ Define Post type
 export interface Post {
@@ -138,19 +142,22 @@ export default function PostsPage() {
   const postsPerPage = 3;
 
   const router = useRouter();
-  const { toast } = useToast();
   const { data: series } = useGetUploadSeriesQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
-  console.log(series?.data, "upload series data");
+  const [deletePost] = useDeletePostMutation();
 
   const handleEdit = (id: string | number) => {
     router.push(`/upload-series/edit-post/${id}`);
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (deletePostId) {
-      setDeletePostId(0);
+      const res = await deletePost(deletePostId);
+      if (res?.data?.success) {
+        toast("✅ Post deleted successfully!");
+        // setDeletePostId(undefined);
+      }
     }
   };
 

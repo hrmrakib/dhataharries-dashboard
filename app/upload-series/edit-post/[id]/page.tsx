@@ -11,10 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import {
-  useCreatePostMutation,
-  useGetUploadSeriesByIdQuery,
-} from "@/redux/feature/uploadSeriesAPI";
+import { useGetUploadSeriesByIdQuery } from "@/redux/feature/uploadSeriesAPI";
 import { useUpdatePostMutation } from "@/redux/feature/blogAPI";
 
 interface FormData {
@@ -114,10 +111,9 @@ export default function UpdatePostForm() {
       if (res?.success) {
         toast({
           title: "✅ Success!",
-          description: "Your post has been created successfully.",
+          description: "Your post has been updated successfully.",
         });
 
-        // Reset form
         setFormData({
           author_name: "",
           title: "",
