@@ -8,7 +8,7 @@ import Providers from "@/redux/Providers";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: "DesignDoc We Simplify",
+  title: "Dashboard of Dhata Harris",
   description: "Created with",
   generator: "dev",
 };
